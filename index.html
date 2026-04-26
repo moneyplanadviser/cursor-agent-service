@@ -50,7 +50,7 @@
       background: rgba(247,248,250,0.92);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      height: 80px;
+      height: 96px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -68,28 +68,34 @@
       line-height: 0;
       flex-shrink: 0;
     }
-    .logo__full {
+    .header-bar .logo__full {
       display: block;
-      height: 50px;
+      height: 64px;
       width: auto;
     }
-    .logo__mark {
+    .header-bar .logo__mark {
       display: none;
-      width: 50px;
-      height: 50px;
+      width: 64px;
+      height: 64px;
       object-fit: contain;
     }
-    .logo--mark-only .logo__full { display: none; }
-    .logo--mark-only .logo__mark { display: block; }
+    .header-bar .logo--mark-only .logo__full { display: none; }
+    .header-bar .logo--mark-only .logo__mark { display: block; }
     @media (max-width: 480px) {
-      .logo--mark-only-sm:not(.logo--mark-only) .logo__full { display: none; }
-      .logo--mark-only-sm:not(.logo--mark-only) .logo__mark { display: block; }
+      .header-bar .logo--mark-only-sm:not(.logo--mark-only) .logo__full { display: none; }
+      .header-bar .logo--mark-only-sm:not(.logo--mark-only) .logo__mark { display: block; }
     }
-    .footer-bar .logo__full { height: 40px; }
-    .footer-bar .logo__mark { width: 40px; height: 40px; }
+    .footer-bar .logo__full { display: block; height: 48px; width: auto; }
+    .footer-bar .logo__mark { display: none; width: 48px; height: 48px; object-fit: contain; }
+    .footer-bar .logo--mark-only .logo__full { display: none; }
+    .footer-bar .logo--mark-only .logo__mark { display: block; }
+    @media (max-width: 480px) {
+      .footer-bar .logo--mark-only-sm:not(.logo--mark-only) .logo__full { display: none; }
+      .footer-bar .logo--mark-only-sm:not(.logo--mark-only) .logo__mark { display: block; }
+    }
     nav { display: flex; gap: 32px; align-items: center; }
     nav a {
-      font-size: 0.875rem;
+      font-size: 0.94rem;
       color: var(--muted);
       transition: color 0.15s;
     }
@@ -121,7 +127,7 @@
 
     /* ─── HERO ─── */
     .hero {
-      min-height: calc(100vh - 80px);
+      min-height: calc(100vh - 96px);
       max-width: var(--page-max);
       margin-left: auto;
       margin-right: auto;
@@ -502,8 +508,8 @@
 <header>
   <div class="layout-inner header-bar">
     <a class="logo logo--mark-only-sm" href="#top" aria-label="SHIRO トップへ">
-      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="250" height="50" decoding="async">
-      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="50" height="50" decoding="async" aria-hidden="true">
+      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="320" height="64" decoding="async">
+      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="64" height="64" decoding="async" aria-hidden="true">
     </a>
     <nav>
       <a href="#pain">課題</a>
@@ -752,8 +758,8 @@
 <footer>
   <div class="layout-inner footer-bar">
     <a class="logo logo--mark-only-sm" href="#top" aria-label="SHIRO トップへ">
-      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="250" height="50" decoding="async">
-      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="50" height="50" decoding="async" aria-hidden="true">
+      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="320" height="64" decoding="async">
+      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="64" height="64" decoding="async" aria-hidden="true">
     </a>
     <div>&copy; 2026 赤木啓太 · All rights reserved.</div>
   </div>
