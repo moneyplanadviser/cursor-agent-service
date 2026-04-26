@@ -50,7 +50,7 @@
       background: rgba(247,248,250,0.92);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      height: 68px;
+      height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -70,13 +70,13 @@
     }
     .logo__full {
       display: block;
-      height: 36px;
+      height: 50px;
       width: auto;
     }
     .logo__mark {
       display: none;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       object-fit: contain;
     }
     .logo--mark-only .logo__full { display: none; }
@@ -85,6 +85,8 @@
       .logo--mark-only-sm:not(.logo--mark-only) .logo__full { display: none; }
       .logo--mark-only-sm:not(.logo--mark-only) .logo__mark { display: block; }
     }
+    .footer-bar .logo__full { height: 40px; }
+    .footer-bar .logo__mark { width: 40px; height: 40px; }
     nav { display: flex; gap: 32px; align-items: center; }
     nav a {
       font-size: 0.875rem;
@@ -119,7 +121,7 @@
 
     /* ─── HERO ─── */
     .hero {
-      min-height: calc(100vh - 68px);
+      min-height: calc(100vh - 80px);
       max-width: var(--page-max);
       margin-left: auto;
       margin-right: auto;
@@ -500,8 +502,8 @@
 <header>
   <div class="layout-inner header-bar">
     <a class="logo logo--mark-only-sm" href="#top" aria-label="SHIRO トップへ">
-      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="200" height="40" decoding="async">
-      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="40" height="40" decoding="async" aria-hidden="true">
+      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="250" height="50" decoding="async">
+      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="50" height="50" decoding="async" aria-hidden="true">
     </a>
     <nav>
       <a href="#pain">課題</a>
@@ -750,8 +752,8 @@
 <footer>
   <div class="layout-inner footer-bar">
     <a class="logo logo--mark-only-sm" href="#top" aria-label="SHIRO トップへ">
-      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="200" height="40" decoding="async">
-      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="40" height="40" decoding="async" aria-hidden="true">
+      <img class="logo__full" src="assets/shiro-logo-ai-signal.png" alt="SHIRO" width="250" height="50" decoding="async">
+      <img class="logo__mark" src="assets/shiro-logo-mark.png" alt="" width="50" height="50" decoding="async" aria-hidden="true">
     </a>
     <div>&copy; 2026 赤木啓太 · All rights reserved.</div>
   </div>
