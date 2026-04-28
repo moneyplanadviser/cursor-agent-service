@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ヒアリングシート｜SHIRO</title>
+  <link rel="icon" type="image/png" href="assets/shiro-logo-mark.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f8fa;
+      --white: #ffffff;
+      --navy: #0f1f3d;
+      --navy2: #1e3a5f;
+      --muted: #6b7280;
+      --light: #e8edf5;
+      --accent: #1e3a5f;
+      --accent-soft: #eef2f8;
+      --border: #e5e7eb;
+      --radius-sm: 8px;
+      --radius: 999px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+                   "Noto Sans JP", sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── HEADER ─── */
+    header {
+      background: rgba(247,248,250,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .header-inner {
+      max-width: 720px;
+      width: 100%;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo img { height: 40px; width: auto; }
+
+    /* ─── PROGRESS ─── */
+    .progress-wrap {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress-inner {
+      max-width: 720px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--light);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--navy2);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 4em;
+      text-align: right;
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 24px 80px;
+    }
+    .form-container {
+      max-width: 720px;
+      width: 100%;
+    }
+
+    /* ─── STEP ─── */
+    .step {
+      display: none;
+      animation: fadeSlideIn 0.35s ease both;
+    }
+    .step.active { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .step-question {
+      font-size: clamp(20px, 4vw, 28px);
+      font-weight: 700;
+      line-height: 1.45;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .step-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    /* ─── INPUTS ─── */
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--navy);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--navy2);
+    }
+    textarea { resize: vertical; min-height: 120px; }
+
+    /* ─── RADIO / CHECKBOX ─── */
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      font-size: 15px;
+    }
+    .option-label:hover { border-color: var(--navy2); }
+    .option-label input { display: none; }
+    .option-label.selected {
+      border-color: var(--navy2);
+      background: var(--accent-soft);
+    }
+    .option-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .option-label.selected .option-icon {
+      border-color: var(--navy2);
+      background: var(--navy2);
+    }
+    .option-icon::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: white;
+      display: none;
+    }
+    .option-label.selected .option-icon::after { display: block; }
+
+    /* checkbox variant */
+    .option-label.checkbox .option-icon {
+      border-radius: 5px;
+    }
+    .option-label.checkbox.selected .option-icon::after {
+      content: '✓';
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 0;
+      background: transparent;
+      width: auto;
+      height: auto;
+      display: block;
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .btn {
+      padding: 14px 32px;
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      border: none;
+      outline: none;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: var(--navy2);
+      color: white;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-back {
+      background: transparent;
+      color: var(--muted);
+      padding: 14px 0;
+    }
+    .btn-back:hover { color: var(--navy); }
+
+    /* ─── COMPLETE ─── */
+    .complete {
+      display: none;
+      text-align: center;
+      padding: 48px 0;
+      animation: fadeSlideIn 0.5s ease both;
+    }
+    .complete.active { display: block; }
+    .complete-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--accent-soft);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 32px;
+    }
+    .complete h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .complete p {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 420px;
+      margin: 0 auto 32px;
+      line-height: 1.8;
+    }
+    .back-link {
+      display: inline-block;
+      color: var(--navy2);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* ─── ERROR ─── */
+    .error-msg {
+      color: #c0392b;
+      font-size: 13px;
+      margin-top: 6px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 480px) {
+      main { padding: 32px 16px 64px; }
+      .btn { padding: 13px 24px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <img src="assets/shiro-logo-ai-signal.png" alt="SHIRO" height="40">
+    </a>
+    <span style="font-size:13px; color:var(--muted);">無料ヒアリング</span>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-inner">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">1 / 7</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+  <div class="form-container">
+
+    <!-- STEP 1: 名前 -->
+    <div class="step active" id="step-1">
+      <div class="step-num">Q1</div>
+      <div class="step-question">お名前を教えてください</div>
+      <div class="step-sub">ニックネームでも大丈夫です。</div>
+      <input type="text" id="q_name" placeholder="例：田中 太郎" autocomplete="name">
+      <div class="error-msg" id="err-1">お名前を入力してください</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="next(1)">次へ →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: メール -->
+    <div class="step" id="step-2">
+      <div class="step-num">Q2</div>
+      <div class="step-question">メールアドレスを教えてください</div>
+      <div class="step-sub">回答後、こちらからご連絡します。</div>
+      <input type="email" id="q_email" placeholder="例：yourname@example.com" autocomplete="email">
+      <div class="error-msg" id="err-2">正しいメールアドレスを入力してください</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="next(2)">次へ →</button>
+        <button class="btn btn-back" onclick="back(2)">← 戻る</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: ビジネス内容 -->
+    <div class="step" id="step-3">
+      <div class="step-num">Q3</div>
+      <div class="step-question">どんなお仕事をされていますか？</div>
+      <div class="step-sub">業種・提供しているサービス・お客様像などを自由に教えてください。</div>
+      <textarea id="q_business" placeholder="例：フリーランスのWebデザイナーです。主に中小企業のLP制作・コーポレートサイトを受注しています。"></textarea>
+      <div class="error-msg" id="err-3">ビジネス内容を入力してください</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="next(3)">次へ →</button>
+        <button class="btn btn-back" onclick="back(3)">← 戻る</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: 困っていること -->
+    <div class="step" id="step-4">
+      <div class="step-num">Q4</div>
+      <div class="step-question">今、いちばん時間を取られている作業は何ですか？</div>
+      <div class="step-sub">「毎週この作業に何時間も…」というものがあれば、ぜひ教えてください。</div>
+      <textarea id="q_pain" placeholder="例：見積書・請求書の作成と管理。クライアントへのメール返信。SNSの投稿管理…など"></textarea>
+      <div class="error-msg" id="err-4">入力してください</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="next(4)">次へ →</button>
+        <button class="btn btn-back" onclick="back(4)">← 戻る</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: 理想 -->
+    <div class="step" id="step-5">
+      <div class="step-num">Q5</div>
+      <div class="step-question">AIで自動化できたら、いちばん嬉しいことは何ですか？</div>
+      <div class="step-sub">「こんなことできる？」という wishlist でもOKです。</div>
+      <textarea id="q_wish" placeholder="例：毎月の請求書を自動で作れるようにしたい。SNSの投稿アイデアをAIに出してもらいたい…など"></textarea>
+      <div class="error-msg" id="err-5">入力してください</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="next(5)">次へ →</button>
+        <button class="btn btn-back" onclick="back(5)">← 戻る</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: ツール経験 -->
+    <div class="step" id="step-6">
+      <div class="step-num">Q6</div>
+      <div class="step-question">普段使っているツールを教えてください</div>
+      <div class="step-sub">あてはまるものをすべて選んでください。</div>
+      <div class="options" id="q_tools">
+        <label class="option-label checkbox" onclick="toggleCheck(this, event)">
+          <input type="checkbox" value="ChatGPT / Claude">
+          <div class="option-icon"></div>
+          <span>ChatGPT / Claude（AI系）</span>
+        </label>
+        <label class="option-label checkbox" onclick="toggleCheck(this, event)">
+          <input type="checkbox" value="Notion">
+          <div class="option-icon"></div>
+          <span>Notion</span>
+        </label>
+        <label class="option-label checkbox" onclick="toggleCheck(this, event)">
+          <input type="checkbox" value="Google Workspace">
+          <div class="option-icon"></div>
+          <span>Google Workspace（Gmail / Docs / Sheets）</span>
+        </label>
+        <label class="option-label checkbox" onclick="toggleCheck(this, event)">
+          <input type="checkbox" value="Excel / Numbers">
+          <div class="option-icon"></div>
+          <span>Excel / Numbers</span>
+        </label>
+        <label class="option-label checkbox" onclick="toggleCheck(this, event)">
+          <input type="checkbox" value="SNS管理ツール">
+          <div class="option-icon"></div>
+          <span>SNS管理ツール（Buffer / Hootsuite 等）</span>
+        </label>
+        <label class="option-label checkbox" onclick="toggleCheck(this, event)">
+          <input type="checkbox" value="特に使っていない">
+          <div class="option-icon"></div>
+          <span>特に使っていない</span>
+        </label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="next(6)">次へ →</button>
+        <button class="btn btn-back" onclick="back(6)">← 戻る</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: 検討温度感 -->
+    <div class="step" id="step-7">
+      <div class="step-num">Q7</div>
+      <div class="step-question">ご検討の状況を教えてください</div>
+      <div class="step-sub">正直に教えてもらえると、ご連絡の参考にします。</div>
+      <div class="options" id="q_intent">
+        <label class="option-label" onclick="selectRadio(this, 'q_intent')">
+          <input type="radio" name="intent" value="すぐにでも始めたい">
+          <div class="option-icon"></div>
+          <span>すぐにでも始めたい</span>
+        </label>
+        <label class="option-label" onclick="selectRadio(this, 'q_intent')">
+          <input type="radio" name="intent" value="まず話を聞きたい">
+          <div class="option-icon"></div>
+          <span>まず話を聞いてから決めたい</span>
+        </label>
+        <label class="option-label" onclick="selectRadio(this, 'q_intent')">
+          <input type="radio" name="intent" value="情報収集中">
+          <div class="option-icon"></div>
+          <span>まだ情報収集している段階</span>
+        </label>
+      </div>
+      <div class="error-msg" id="err-7">選択してください</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="submit()">送信する</button>
+        <button class="btn btn-back" onclick="back(7)">← 戻る</button>
+      </div>
+    </div>
+
+    <!-- COMPLETE -->
+    <div class="complete" id="complete">
+      <div class="complete-icon">
+        <img src="assets/shiro-logo-ai-signal-icon-only-on-white.png" alt="SHIRO" style="width:48px;height:48px;object-fit:contain;">
+      </div>
+      <h2>ありがとうございました！</h2>
+      <p>
+        ヒアリング内容を確認して、<strong>2営業日以内</strong>にご連絡します。<br>
+        楽しみにお待ちください。
+      </p>
+      <a class="back-link" href="index.html">← SHIROのサービスページに戻る</a>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  © 2025 SHIRO. All rights reserved.
+</footer>
+
+<!-- ─── HIDDEN FORM (Formspree submission) ─── -->
+<form id="hiddenForm" action="https://formspree.io/f/xyklqlgz" method="POST" style="display:none">
+  <input type="hidden" name="name"       id="hf_name">
+  <input type="hidden" name="email"      id="hf_email">
+  <input type="hidden" name="business"   id="hf_business">
+  <input type="hidden" name="pain"       id="hf_pain">
+  <input type="hidden" name="wish"       id="hf_wish">
+  <input type="hidden" name="tools"      id="hf_tools">
+  <input type="hidden" name="intent"     id="hf_intent">
+  <input type="hidden" name="_subject"   value="【SHIROヒアリング】新しい回答が届きました">
+  <input type="hidden" name="_language"  value="ja">
+</form>
+
+<script>
+  const TOTAL = 7;
+  let current = 1;
+
+  function updateProgress(step) {
+    const pct = Math.round(((step - 1) / TOTAL) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = step + ' / ' + TOTAL;
+  }
+
+  function showStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById('step-' + n);
+    if (el) el.classList.add('active');
+    updateProgress(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validate(step) {
+    const err = document.getElementById('err-' + step);
+    if (!err) return true;
+
+    let ok = true;
+    if (step === 1) ok = document.getElementById('q_name').value.trim() !== '';
+    if (step === 2) ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('q_email').value.trim());
+    if (step === 3) ok = document.getElementById('q_business').value.trim() !== '';
+    if (step === 4) ok = document.getElementById('q_pain').value.trim() !== '';
+    if (step === 5) ok = document.getElementById('q_wish').value.trim() !== '';
+    if (step === 7) ok = document.querySelector('#q_intent .selected') !== null;
+
+    if (ok) { err.classList.remove('show'); }
+    else     { err.classList.add('show'); }
+    return ok;
+  }
+
+  function next(step) {
+    if (!validate(step)) return;
+    current = step + 1;
+    showStep(current);
+  }
+
+  function back(step) {
+    current = step - 1;
+    showStep(current);
+  }
+
+  function selectRadio(el, groupId) {
+    document.querySelectorAll('#' + groupId + ' .option-label').forEach(l => l.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function toggleCheck(el, e) {
+    e.preventDefault();
+    el.classList.toggle('selected');
+  }
+
+  async function submit() {
+    if (!validate(7)) return;
+
+    const tools = [...document.querySelectorAll('#q_tools .selected input')]
+      .map(i => i.value).join('、') || 'なし';
+    const intent = document.querySelector('#q_intent .selected input')?.value || '';
+
+    document.getElementById('hf_name').value     = document.getElementById('q_name').value.trim();
+    document.getElementById('hf_email').value    = document.getElementById('q_email').value.trim();
+    document.getElementById('hf_business').value = document.getElementById('q_business').value.trim();
+    document.getElementById('hf_pain').value     = document.getElementById('q_pain').value.trim();
+    document.getElementById('hf_wish').value     = document.getElementById('q_wish').value.trim();
+    document.getElementById('hf_tools').value    = tools;
+    document.getElementById('hf_intent').value   = intent;
+
+    // Formspree fetch送信
+    const form = document.getElementById('hiddenForm');
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      // 成功・失敗どちらも完了画面へ（デモ用は常に完了）
+    } catch (_) {}
+
+    // 完了画面へ
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('complete').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // 初期化
+  updateProgress(1);
+</script>
+</body>
+</html>
