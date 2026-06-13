@@ -362,55 +362,99 @@
     .target-item span { font-size: 0.95rem; line-height: 1.7; }
 
     /* ─── PRICE ─── */
-    .price-wrap {
+    .price-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items: start;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: stretch;
     }
-    .price-card {
+    .plan-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .plan-card--featured {
       background: var(--navy);
       color: #fff;
-      border-radius: 16px;
-      padding: 48px 40px;
+      border-color: var(--navy);
+      box-shadow: 0 18px 40px rgba(15,31,61,0.18);
     }
-    .price-tag {
+    .plan-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3b5998;
+      color: #fff;
       font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      opacity: 0.6;
-      margin-bottom: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 5px 16px;
+      border-radius: 999px;
+      white-space: nowrap;
     }
-    .price-amount {
-      font-size: 3rem;
+    .plan-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+    .plan-price {
+      font-size: 2.2rem;
       font-weight: 900;
       letter-spacing: -0.03em;
-      margin-bottom: 6px;
+      line-height: 1.1;
+      margin-bottom: 4px;
     }
-    .price-original {
-      font-size: 0.85rem;
-      opacity: 0.5;
-      text-decoration: line-through;
-      margin-bottom: 32px;
+    .plan-price small {
+      font-size: 0.95rem;
+      font-weight: 600;
+      opacity: 0.7;
+      margin-left: 2px;
     }
-    .price-features { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px; }
-    .price-features li {
+    .plan-period {
+      font-size: 0.78rem;
+      opacity: 0.6;
+      margin-bottom: 28px;
+    }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; flex: 1; }
+    .plan-features li {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
       font-size: 0.875rem;
-      opacity: 0.9;
+      line-height: 1.5;
     }
-    .price-features li::before {
-      content: '→';
-      opacity: 0.5;
+    .plan-features li::before {
+      content: '✓';
+      color: #3b5998;
+      font-weight: 700;
       flex-shrink: 0;
     }
-    .price-note {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.8;
+    .plan-card--featured .plan-features li::before { color: #8fb0e8; }
+    /* 含まれない項目（×表記） */
+    .plan-features li.off { opacity: 0.5; }
+    .plan-features li.off::before { content: '✕'; color: var(--muted); }
+    .plan-card--featured .plan-features li.off::before { color: rgba(255,255,255,0.55); }
+    /* プランの決め手（ハイライト） */
+    .plan-features li.key {
+      font-weight: 700;
+      background: rgba(59,89,152,0.10);
+      border-radius: 8px;
+      padding: 7px 10px;
+      margin: -3px -6px;
     }
-    .price-note strong { color: var(--navy); display: block; font-size: 1rem; margin-bottom: 8px; }
+    .plan-card--featured .plan-features li.key { background: rgba(255,255,255,0.15); }
+    .plan-note {
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 40px;
+    }
 
     /* ─── PROFILE ─── */
     .profile-wrap {
@@ -424,16 +468,13 @@
       border-radius: 16px;
     }
     .profile-avatar {
-      width: 80px;
-      height: 80px;
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
-      background: var(--navy);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
+      object-fit: cover;
       flex-shrink: 0;
+      border: 3px solid var(--white);
+      box-shadow: 0 4px 16px rgba(15,31,61,0.18);
     }
     .profile-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
     .profile-role { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
@@ -496,7 +537,8 @@
       .section { padding: 72px 24px; }
       .pain-grid { grid-template-columns: 1fr; }
       .includes-grid { grid-template-columns: 1fr; }
-      .price-wrap { grid-template-columns: 1fr; }
+      .price-grid { grid-template-columns: 1fr; }
+      .plan-card--featured { order: -1; }
       .profile-wrap { grid-template-columns: 1fr; }
       .footer-bar { flex-direction: column; gap: 8px; padding: 24px; }
     }
@@ -629,27 +671,27 @@
 <div class="section">
   <div class="section-label">INCLUDES</div>
   <h2>提供内容</h2>
-  <p class="section-sub">画面共有・チャット・非同期のやり取りを組み合わせてサポートします。</p>
+  <p class="section-sub">月2回の画面共有・チャット・テンプレートを組み合わせて、3ヶ月伴走します。</p>
   <div class="includes-grid">
     <div class="include-card">
-      <div class="include-num">01 · 初回セットアップ面談</div>
-      <h3>60分｜環境構築 + AI秘書の初期設定</h3>
-      <p>画面共有で一緒に進めます。Cursorのインストールからエージェントが動くまで。</p>
+      <div class="include-num">01 · 初回ゴール設計</div>
+      <h3>90分｜3ヶ月で作るツールを決める</h3>
+      <p>業務を棚卸しして、まず作る1つのAIツールとゴールを一緒に定めます。</p>
     </div>
     <div class="include-card">
-      <div class="include-num">02 · チャットサポート</div>
+      <div class="include-num">02 · 月2回のZoom伴走</div>
+      <h3>1回60分｜画面共有で一緒に手を動かす</h3>
+      <p>環境構築からエージェント実装まで、つまずきポイントを潰しながら進めます。</p>
+    </div>
+    <div class="include-card">
+      <div class="include-num">03 · チャット相談・課題レビュー</div>
       <h3>期間中いつでも相談OK</h3>
       <p>エラーや「こうしたい」が出たときに相談できます。基本的に当日中に返答します。</p>
     </div>
     <div class="include-card">
-      <div class="include-num">03 · テンプレート提供</div>
+      <div class="include-num">04 · テンプレート提供</div>
       <h3>実運用中のエージェント一式</h3>
-      <p>AI秘書・マーケ・PM管理など、赤木が実際に使っているテンプレートをそのまま渡します。</p>
-    </div>
-    <div class="include-card">
-      <div class="include-num">04 · フォローアップ面談</div>
-      <h3>30分 × 1回｜1〜2週間後</h3>
-      <p>つまずいた箇所を解消し、次のエージェント設計を一緒に考えます。</p>
+      <p>AI秘書・マーケ・PM管理など、実際に使っているテンプレートをそのまま渡します。</p>
     </div>
   </div>
 </div>
@@ -690,25 +732,52 @@
 <!-- PRICE -->
 <div class="section" id="price">
   <div class="section-label">PRICE</div>
-  <h2>料金</h2>
-  <p class="section-sub">環境構築からAI秘書の立ち上げまで、画面共有で一緒に進めます。</p>
-  <div class="price-wrap">
-    <div class="price-card">
-      <div class="price-tag">AIエージェント構築サポート</div>
-      <div class="price-amount">¥9,800</div>
-      <ul class="price-features">
-        <li>セットアップ面談 60分（オンライン）</li>
-        <li>1週間テキストフォローアップ（回数無制限）</li>
-        <li>エージェントテンプレート一式</li>
-        <li>Windows / Mac どちらでも対応</li>
+  <h2>Claude Code 実装伴走 料金プラン</h2>
+  <p class="section-sub">まずは3ヶ月で、自分の業務に使えるAIツールを1つ作る。画面共有で一緒に進めます。</p>
+  <div class="price-grid">
+    <!-- ライト -->
+    <div class="plan-card">
+      <div class="plan-name">ライトプラン</div>
+      <div class="plan-price">¥29,800<small>/月</small></div>
+      <div class="plan-period">月額・3ヶ月〜</div>
+      <ul class="plan-features">
+        <li>月2回 Zoom 60分</li>
+        <li>基本操作の確認</li>
+        <li>小さな課題の整理</li>
+        <li>課題レビュー</li>
+        <li class="off">チャット相談（Zoom時間内のみ）</li>
       </ul>
-      <a href="#cta" class="btn btn-outline btn-lg" style="color:#fff; border-color:rgba(255,255,255,0.4); width:100%; justify-content:center;">申し込む →</a>
+      <a href="#cta" class="btn btn-outline btn-lg" style="width:100%; justify-content:center;">申し込む →</a>
     </div>
-    <div class="price-note">
-      <strong>こんな方におすすめです</strong>
-      AIを使いたいけど何から始めればいいかわからない方、Cursorや Claude Codeに興味があるけど自分で環境を作る自信がない方へ。あなたのビジネスに合った形で、一緒に設計します。
+    <!-- 標準（おすすめ） -->
+    <div class="plan-card plan-card--featured">
+      <div class="plan-badge">おすすめ</div>
+      <div class="plan-name">標準プラン</div>
+      <div class="plan-price">¥39,800<small>/月</small></div>
+      <div class="plan-period">月額・3ヶ月〜</div>
+      <ul class="plan-features">
+        <li>ライトプランのすべて</li>
+        <li class="key">チャット相談（期間中いつでも）</li>
+        <li>小さな運用ツールを1つ作成</li>
+      </ul>
+      <a href="#cta" class="btn btn-lg" style="background:#fff; color:var(--navy); width:100%; justify-content:center;">申し込む →</a>
+    </div>
+    <!-- 実案件相談込み -->
+    <div class="plan-card">
+      <div class="plan-name">実案件相談込み</div>
+      <div class="plan-price">¥49,800<small>/月</small></div>
+      <div class="plan-period">月額・3ヶ月〜</div>
+      <ul class="plan-features">
+        <li>標準プランのすべて</li>
+        <li class="key">実案件（お客様向け）の相談</li>
+        <li>メニュー設計・価格設計</li>
+        <li>提案文の整理・納品起こし</li>
+        <li>実案件の壁打ち</li>
+      </ul>
+      <a href="#cta" class="btn btn-outline btn-lg" style="width:100%; justify-content:center;">申し込む →</a>
     </div>
   </div>
+  <p class="plan-note">3ヶ月を第1フェーズとして進めます</p>
 </div>
 
 <hr class="divider">
@@ -718,7 +787,7 @@
   <div class="section-label">PROFILE</div>
   <h2>担当者紹介</h2>
   <div class="profile-wrap">
-    <div class="profile-avatar">👤</div>
+    <img class="profile-avatar" src="assets/aoki-profile.png" alt="赤木 啓太" width="96" height="96" decoding="async">
     <div>
       <div class="profile-name">赤木 啓太</div>
       <div class="profile-role">組み込みソフトウェアエンジニア 9年以上 · SHIRO 代表</div>
@@ -742,7 +811,7 @@
 <div class="cta-wrap" id="cta">
   <div class="layout-inner">
     <h2>AIエージェント環境を、一緒に作りませんか？</h2>
-    <p>Cursor × Claude Code で、あなたのビジネスに合ったAI秘書を構築します。<br>オンライン60分 ＋ 1週間のテキストサポート付き。</p>
+    <p>Cursor × Claude Code で、あなたのビジネスに合ったAIツールを構築します。<br>まずは3ヶ月で、業務に使える1つを一緒に作ります。</p>
     <div class="cta-btns">
       <a href="#" class="btn btn-primary btn-lg">申し込む →</a>
       <a href="#profile" class="btn btn-outline btn-lg">担当者を見る</a>
