@@ -455,6 +455,25 @@
       color: var(--muted);
       margin-top: 40px;
     }
+    .trial-cta {
+      margin: 24px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px 16px;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .trial-cta a {
+      color: var(--navy);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--border);
+      transition: text-decoration-color 0.15s;
+    }
+    .trial-cta a:hover { text-decoration-color: var(--navy); }
 
     /* ─── PROFILE ─── */
     .profile-wrap {
@@ -778,6 +797,12 @@
     </div>
   </div>
   <p class="plan-note">3ヶ月を第1フェーズとして進めます</p>
+
+  <!-- お試しプラン CTA + PayPal 支払いリンク（控えめに横一行） -->
+  <div class="trial-cta">
+    <span>まずは1ヶ月だけ試してみたい方は</span>
+    <a href="https://www.paypal.com/ncp/payment/74AW89GYT7674" target="_blank" rel="noopener">お試しプランはこちら →</a>
+  </div>
 </div>
 
 <hr class="divider">
