@@ -158,18 +158,18 @@
       background: var(--navy);
     }
     .hero h1 {
-      font-size: clamp(1.85rem, 3.6vw, 2.75rem);
+      font-size: 2.6rem;
       font-weight: 900;
       line-height: 1.25;
-      letter-spacing: -0.03em;
+      letter-spacing: 0;
       color: var(--navy);
       margin-bottom: 16px;
     }
     .hero-hook {
-      font-size: clamp(1.55rem, 2.8vw, 2.35rem);
+      font-size: 2rem;
       font-weight: 800;
       line-height: 1.25;
-      letter-spacing: -0.03em;
+      letter-spacing: 0;
       color: var(--navy);
       margin-bottom: 20px;
     }
@@ -253,10 +253,10 @@
       background: var(--muted);
     }
     h2 {
-      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-size: 2.25rem;
       font-weight: 800;
       line-height: 1.3;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
       margin-bottom: 16px;
     }
     .section-sub {
@@ -307,7 +307,7 @@
       font-size: 3rem;
       font-weight: 900;
       color: var(--light);
-      letter-spacing: -0.04em;
+      letter-spacing: 0;
       line-height: 1;
       padding-top: 4px;
     }
@@ -405,7 +405,7 @@
     .plan-price {
       font-size: 2.2rem;
       font-weight: 900;
-      letter-spacing: -0.03em;
+      letter-spacing: 0;
       line-height: 1.1;
       margin-bottom: 4px;
     }
@@ -511,7 +511,7 @@
     }
     .vision-ribbon p {
       margin: 0;
-      font-size: clamp(1rem, 2.1vw, 1.2rem);
+      font-size: 1.1rem;
       font-weight: 600;
       opacity: 0.92;
       line-height: 1.65;
@@ -553,6 +553,9 @@
       nav { display: none; }
       .hero { grid-template-columns: 1fr; padding: 60px 24px; min-height: auto; }
       .hero-right { display: none; }
+      .hero h1 { font-size: 2rem; }
+      .hero-hook { font-size: 1.5rem; }
+      h2 { font-size: 1.8rem; }
       .section { padding: 72px 24px; }
       .pain-grid { grid-template-columns: 1fr; }
       .includes-grid { grid-template-columns: 1fr; }
@@ -588,18 +591,19 @@
     <div class="hero-label">FOR SOLO BUSINESS</div>
     <h1>一人ビジネスに、<br>AIの城と白い時間を。</h1>
 
+    <p class="hero-hook">一人で抱え込む仕事を、<em>仕組み</em>で軽くする。</p>
     <p class="hero-sub">
-      Cursor × Claude Code で、環境構築からAI秘書まで。<br>
-      画面共有で一緒に建てます。
+      SHIROは、一人ビジネスの業務整理から仕組み化まで伴走します。<br>
+      散らばった情報、後回しの事務、属人化した手順を整え、あなたの時間を取り戻すための土台を一緒につくります。
     </p>
     <div class="hero-btns">
       <a href="#cta" class="btn btn-primary btn-lg">申し込む →</a>
       <a href="#flow" class="btn btn-outline btn-lg">詳しく見る</a>
     </div>
     <div class="trust-badges">
-      <div class="trust-badge">組み込みソフトウェアエンジニア 9年以上</div>
-      <div class="trust-badge">電気電子工学科卒</div>
-      <div class="trust-badge">自社エージェント10以上を実運用中</div>
+      <div class="trust-badge">一人社長・個人事業主向け</div>
+      <div class="trust-badge">業務整理から導入まで伴走</div>
+      <div class="trust-badge">自分で回せる仕組みを残す</div>
     </div>
   </div>
   <div class="hero-right">
@@ -609,7 +613,7 @@
       <circle cx="120" cy="180" r="6" fill="#c4cfe0"/>
       <circle cx="80" cy="320" r="4" fill="#d0d9e8"/>
       <circle cx="200" cy="100" r="3" fill="#c4cfe0"/>
-      <text x="60" y="500" font-family="serif" font-size="120" font-weight="900" fill="#e8edf5" letter-spacing="-4">城</text>
+      <text x="60" y="500" font-family="serif" font-size="120" font-weight="900" fill="#e8edf5" letter-spacing="0">城</text>
     </svg>
   </div>
 </div>
@@ -620,27 +624,27 @@
 <div class="section" id="pain">
   <div class="section-label">PROBLEM</div>
   <h2>こんな悩み、<br>ありませんか？</h2>
-  <p class="section-sub">AIを使い始めたのに、なぜかバラバラで管理できていない。</p>
+  <p class="section-sub">一人で事業を回していると、考える仕事よりも、片づける仕事に時間を取られていく。</p>
   <div class="pain-grid">
     <div class="pain-card">
       <div class="pain-num">01</div>
-      <h3>Claudeのチャットが分散して迷子</h3>
-      <p>複数のプロジェクト・チャットに情報が散らばり、「どこで相談したっけ？」が日常になっている。</p>
+      <h3>情報とタスクが散らばっている</h3>
+      <p>顧客メモ、投稿案、経理、次にやることが別々の場所にあり、探すだけで時間を使っている。</p>
     </div>
     <div class="pain-card">
       <div class="pain-num">02</div>
-      <h3>Cursorの設定が難しくて手が止まる</h3>
-      <p>「Cursorがいい」と聞いたものの、インストールから先に進めず結局使っていない。</p>
+      <h3>事務作業がいつも後回しになる</h3>
+      <p>本当は売上づくりやお客様対応に時間を使いたいのに、記録・整理・確認作業が積み上がる。</p>
     </div>
     <div class="pain-card">
       <div class="pain-num">03</div>
-      <h3>Windowsで使える情報が少ない</h3>
-      <p>記事や動画がMac向けばかりで、Windows環境でどうすればいいか分からない。</p>
+      <h3>AIを使っても仕事の流れにならない</h3>
+      <p>単発の相談はできても、毎日の業務に組み込む形まで落とし込めず、便利な道具で止まっている。</p>
     </div>
     <div class="pain-card">
       <div class="pain-num">04</div>
-      <h3>何から作ればいいか分からない</h3>
-      <p>エージェントを作りたいけど、秘書？経理？マーケ？どこから手をつければ正解かが見えない。</p>
+      <h3>仕組み化を相談できる相手がいない</h3>
+      <p>自分の事業に合わせて、何を任せて、どこを人が見るべきかを一緒に整理してくれる人がいない。</p>
     </div>
   </div>
 </div>
@@ -650,35 +654,35 @@
 <!-- FLOW -->
 <div class="section" id="flow">
   <div class="section-label">SOLUTION</div>
-  <h2>4ステップで<br>城を建てる。</h2>
-  <p class="section-sub">設定から運用まで伴走します。まず秘書1つ動けば、あとは広がります。</p>
+  <h2>仕事の流れを整え、<br>AIが支える形に変える。</h2>
+  <p class="section-sub">最初に作るのは、派手なツールではなく、あなたの事業を毎日少し軽くする仕組みです。</p>
   <div class="flow">
     <div class="flow-item">
       <div class="flow-num">01</div>
       <div class="flow-body">
-        <h3>環境構築（Cursor + Claude Code）</h3>
-        <p>WindowsでもMacでも対応。インストールからAPI連携まで、つまずきポイントを潰しながら一緒に進めます。</p>
+        <h3>業務と悩みを棚卸しする</h3>
+        <p>毎週くり返している作業、後回しになりやすい作業、判断が必要な作業を分けて、最初に整える場所を決めます。</p>
       </div>
     </div>
     <div class="flow-item">
       <div class="flow-num">02</div>
       <div class="flow-body">
-        <h3>AI秘書エージェントを構築</h3>
-        <p>週報まとめ・ToDoリスト・面談メモ保存など、まず「秘書」として動くエージェントを一緒に作ります。これ1つで管理の軸ができます。</p>
+        <h3>小さな仕組みを1つ作る</h3>
+        <p>週報まとめ・ToDo整理・面談メモ保存など、事業の土台になる1つを一緒に作ります。ここが管理の軸になります。</p>
       </div>
     </div>
     <div class="flow-item">
       <div class="flow-num">03</div>
       <div class="flow-body">
-        <h3>用途に合わせて城を拡張</h3>
-        <p>SNS投稿・経理帳簿・顧客管理・メール下書きなど、やりたいことに合わせてエージェントを追加していきます。</p>
+        <h3>事業に合わせて広げる</h3>
+        <p>SNS投稿・経理帳簿・顧客管理・メール下書きなど、時間を奪っている業務から順に、任せられる形へ変えていきます。</p>
       </div>
     </div>
     <div class="flow-item">
       <div class="flow-num">04</div>
       <div class="flow-body">
-        <h3>自走できる状態にして卒業</h3>
-        <p>自分でエージェントを修正・追加できるようになることがゴール。依存させず、使いこなせるようになるまで伴走します。</p>
+        <h3>自分で回せる状態にする</h3>
+        <p>作って終わりではなく、自分で直し、増やし、使い続けられる状態を目指します。依存ではなく、自走のための伴走です。</p>
       </div>
     </div>
   </div>
@@ -694,8 +698,8 @@
   <div class="includes-grid">
     <div class="include-card">
       <div class="include-num">01 · 初回ゴール設計</div>
-      <h3>90分｜3ヶ月で作るツールを決める</h3>
-      <p>業務を棚卸しして、まず作る1つのAIツールとゴールを一緒に定めます。</p>
+      <h3>90分｜3ヶ月で整える業務を決める</h3>
+      <p>業務を棚卸しして、まず作る1つの仕組みとゴールを一緒に定めます。</p>
     </div>
     <div class="include-card">
       <div class="include-num">02 · 月2回のZoom伴走</div>
@@ -725,11 +729,11 @@
   <ul class="target-list">
     <li class="target-item">
       <div class="target-check">✓</div>
-      <span>Claude（ブラウザ版）を使っているが、チャットが分散して管理できていない</span>
+      <span>日々の情報やタスクが散らばり、管理するだけで時間を使っている</span>
     </li>
     <li class="target-item">
       <div class="target-check">✓</div>
-      <span>AIで業務を効率化したいが、どこから手をつければいいか分からない</span>
+      <span>AIで業務を軽くしたいが、自分の仕事のどこに使えばいいか分からない</span>
     </li>
     <li class="target-item">
       <div class="target-check">✓</div>
@@ -737,11 +741,11 @@
     </li>
     <li class="target-item">
       <div class="target-check">✓</div>
-      <span>Cursorに興味はあるが、設定が怖くて手が止まっている</span>
+      <span>便利なツールを試しても、実際の仕事の流れに定着しない</span>
     </li>
     <li class="target-item">
       <div class="target-check">✓</div>
-      <span>Windowsユーザーで、Mac向け情報ばかりで困っている</span>
+      <span>一人で調べながら進めるより、画面を見ながら一緒に整えてほしい</span>
     </li>
   </ul>
 </div>
@@ -751,8 +755,8 @@
 <!-- PRICE -->
 <div class="section" id="price">
   <div class="section-label">PRICE</div>
-  <h2>Claude Code 実装伴走 料金プラン</h2>
-  <p class="section-sub">まずは3ヶ月で、自分の業務に使えるAIツールを1つ作る。画面共有で一緒に進めます。</p>
+  <h2>業務エージェント構築 料金プラン</h2>
+  <p class="section-sub">Cursor / Claude Code を使った実装伴走です。まずは3ヶ月で、自分の業務に使える仕組みを1つ作ります。</p>
   <div class="price-grid">
     <!-- ライト -->
     <div class="plan-card">
@@ -835,8 +839,8 @@
 <!-- CTA -->
 <div class="cta-wrap" id="cta">
   <div class="layout-inner">
-    <h2>AIエージェント環境を、一緒に作りませんか？</h2>
-    <p>Cursor × Claude Code で、あなたのビジネスに合ったAIツールを構築します。<br>まずは3ヶ月で、業務に使える1つを一緒に作ります。</p>
+    <h2>一人で抱えている仕事を、整理しませんか？</h2>
+    <p>あなたの事業に合った業務の流れを見直し、AIが支える仕組みに変えていきます。<br>まずは3ヶ月で、毎日使える1つを一緒に作ります。</p>
     <div class="cta-btns">
       <a href="#" class="btn btn-primary btn-lg">申し込む →</a>
       <a href="#profile" class="btn btn-outline btn-lg">担当者を見る</a>
