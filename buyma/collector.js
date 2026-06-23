@@ -5,23 +5,89 @@
 (function () {
   var BM = window.__BM || {};
   var EXEC_URL = BM.exec || '';
-  var KEY = BM.key || '';
   if (!EXEC_URL) { alert('設定が読み込めませんでした（exec未設定）'); return; }
+  var KEY = '';   // 鍵はローダーに直書きしない。localStorage or 入力で取得（SHIRO.gate）。
+
+  // ── SHIRO 共通: 鍵(localStorage)＋保存先＋鍵ゲート（停止/期限で再入力）。collector.js / info_scraper.js / image_ingest.gs と同期 ──
+  var SHIRO = (function () {
+    var KKEY = 'shiro_buyma_key';
+    function getKey() { try { return localStorage.getItem(KKEY) || ''; } catch (e) { return ''; } }
+    function setKey(v) { try { v ? localStorage.setItem(KKEY, v) : localStorage.removeItem(KKEY); } catch (e) {} }
+    function getDest(kind) { try { return localStorage.getItem('shiro_buyma_dest_' + kind) || ''; } catch (e) { return ''; } }
+    function setDest(kind, v) { try { localStorage.setItem('shiro_buyma_dest_' + kind, v || ''); } catch (e) {} }
+    function checkKey(exec, key, tool, done) {
+      if (!key) { done({ ok: false, status: 'no_key' }); return; }
+      var cb = '__shiroCk_' + Date.now(), s;
+      var to = setTimeout(function () { cleanup(); done({ ok: false, status: 'unreachable' }); }, 8000);
+      function cleanup() { try { delete window[cb]; } catch (e) {} if (s && s.parentNode) s.parentNode.removeChild(s); clearTimeout(to); }
+      window[cb] = function (r) { cleanup(); done(r || { ok: false, status: 'unreachable' }); };
+      s = document.createElement('script');
+      s.src = exec + '?action=checkkey&tool=' + encodeURIComponent(tool) + '&key=' + encodeURIComponent(key) + '&cb=' + cb + '&t=' + Date.now();
+      s.onerror = function () { cleanup(); done({ ok: false, status: 'unreachable' }); };
+      document.body.appendChild(s);
+    }
+    function msgFor(st) {
+      return ({ stopped: 'この鍵は停止中です。', expired: '鍵の有効期限が切れています。', unknown: '鍵が見つかりません。',
+        wrong_tool: 'この鍵はこのツール用ではありません。', unreachable: 'サーバーに接続できません。時間をおいて再実行してください。' })[st] || '鍵を確認してください。';
+    }
+    function gate(exec, tool, onOK) {   // 有効な鍵を保証してから onOK(key)。無効/未入力なら入力UIを出す。
+      var key = getKey();
+      checkKey(exec, key, tool, function (r) {
+        if (r.ok) { onOK(key); return; }
+        if (key && r.status !== 'no_key' && r.status !== 'unreachable') setKey(''); // 切れた鍵は捨てて再入力
+        promptKey(exec, tool, r.status, onOK);
+      });
+    }
+    function promptKey(exec, tool, st, onOK) {
+      var ID = '__shiro_key_gate'; var old = document.getElementById(ID); if (old) old.remove();
+      var d = document.createElement('div'); d.id = ID;
+      d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.6);font:14px/1.6 system-ui,sans-serif';
+      d.innerHTML = '<div style="max-width:420px;margin:14vh auto;background:#fff;border-radius:12px;padding:22px;color:#222">'
+        + '<div style="font-weight:bold;font-size:16px;margin-bottom:6px">SHIRO ライセンスキー</div>'
+        + '<div style="color:#666;font-size:13px;margin-bottom:10px">' + (st && st !== 'no_key' ? msgFor(st) + '<br>' : '') + '配布された鍵を入力してください（次回から自動で省略されます）。</div>'
+        + '<input id="__shiro_key_in" placeholder="SHIRO-XXXX-XXXX-XXXX-XXXX" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #ccc;border-radius:8px;font-size:14px">'
+        + '<div id="__shiro_key_msg" style="color:#c00;font-size:12px;min-height:16px;margin:6px 2px"></div>'
+        + '<div style="text-align:right"><button id="__shiro_key_x" style="background:#eee;border:0;border-radius:8px;padding:8px 14px;margin-right:6px;cursor:pointer">閉じる</button>'
+        + '<button id="__shiro_key_ok" style="background:#1a73e8;color:#fff;border:0;border-radius:8px;padding:8px 16px;cursor:pointer">確認</button></div></div>';
+      document.body.appendChild(d);
+      var inp = d.querySelector('#__shiro_key_in'); inp.focus();
+      var m = d.querySelector('#__shiro_key_msg');
+      d.querySelector('#__shiro_key_x').onclick = function () { d.remove(); };
+      var ok = d.querySelector('#__shiro_key_ok');
+      ok.onclick = function () {
+        var v = (inp.value || '').trim();
+        if (!v) { m.textContent = '鍵を入力してください'; return; }
+        ok.disabled = true; m.style.color = '#666'; m.textContent = '確認中…';
+        checkKey(exec, v, tool, function (r) {
+          ok.disabled = false;
+          if (r.ok) { setKey(v); d.remove(); onOK(v); }
+          else { m.style.color = '#c00'; m.textContent = msgFor(r.status); }
+        });
+      };
+      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') ok.click(); });
+    }
+    return { getKey: getKey, setKey: setKey, getDest: getDest, setDest: setDest, gate: gate };
+  })();
+
+  // 有効な鍵を確保してから本体起動（鍵が切れていれば再入力UI）
+  SHIRO.gate(EXEC_URL, 'buyma-image', function (k) { KEY = k; bootRules(); });
 
   // --- 学習ルールを JSONP で取得 → 取れたら（or タイムアウトで）picker起動 ---
-  var started = false;
-  function start(RULES) {
-    if (started) return; started = true;
-    try { delete window[cb]; } catch (e) {}
-    picker(RULES || {});
+  function bootRules() {
+    var started = false;
+    function start(RULES) {
+      if (started) return; started = true;
+      try { delete window[cb]; } catch (e) {}
+      picker(RULES || {});
+    }
+    var cb = '__bmRules_' + Date.now();
+    window[cb] = function (r) { start(r); };
+    var rs = document.createElement('script');
+    rs.src = EXEC_URL + '?action=rules&cb=' + cb + '&t=' + Date.now();
+    rs.onerror = function () { start({}); };
+    document.body.appendChild(rs);
+    setTimeout(function () { start({}); }, 4000); // 取得できなくても起動（汎用判定）
   }
-  var cb = '__bmRules_' + Date.now();
-  window[cb] = function (r) { start(r); };
-  var rs = document.createElement('script');
-  rs.src = EXEC_URL + '?action=rules&cb=' + cb + '&t=' + Date.now();
-  rs.onerror = function () { start({}); };
-  document.body.appendChild(rs);
-  setTimeout(function () { start({}); }, 4000); // 取得できなくても起動（汎用判定）
 
   // ====================================================================
   function picker(RULES) {
@@ -137,8 +203,13 @@
         + '<span class="__bm_dest" data-v="drive" style="display:inline-block;padding:3px 10px;border-radius:14px;cursor:pointer;margin-right:4px;background:#1a73e8;color:#fff">Google Drive</span>'
         + '<span class="__bm_dest" data-v="local" style="display:inline-block;padding:3px 10px;border-radius:14px;cursor:pointer;background:#eee;color:#333">このPCにDL</span>'
         + '<span style="margin-left:10px">クリックで選択（計' + imgs.length + '件）'
-        + ' <a href="#" id="__bm_all">全選択</a>/<a href="#" id="__bm_none">全解除</a></span></div></div>'
+        + ' <a href="#" id="__bm_all">全選択</a>/<a href="#" id="__bm_none">全解除</a></span></div>'
+        + '<div id="__bm_destrow" style="margin-top:6px;color:#666;font-size:13px">保存先フォルダ(Drive)のURL: '
+        + '<input id="__bm_destfolder" placeholder="https://drive.google.com/drive/folders/..." style="width:340px;max-width:68%;padding:5px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px"></div></div>'
         + '<div style="padding-top:8px">' + cards + '</div>');
+      var destFolderInp = root.querySelector('#__bm_destfolder');
+      destFolderInp.value = SHIRO.getDest('drive'); // 前回値
+      var destRow = root.querySelector('#__bm_destrow');
       var dest = 'drive';
       var destBtns = Array.prototype.slice.call(root.querySelectorAll('.__bm_dest'));
       destBtns.forEach(function (d) {
@@ -149,6 +220,7 @@
             x.style.background = on ? '#1a73e8' : '#eee';
             x.style.color = on ? '#fff' : '#333';
           });
+          destRow.style.display = (dest === 'drive') ? '' : 'none'; // ローカルDLのときはフォルダURL欄を隠す
         };
       });
       var tiles = function () { return Array.prototype.slice.call(root.querySelectorAll('.__bm_tile')); };
@@ -173,6 +245,29 @@
         return m ? m[1].toLowerCase().replace('jpeg', 'jpg') : 'jpg';
       };
       var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+      // BUYMAは JPEG/PNG/GIF のみ対応（WebP/AVIF不可）。非対応形式は保存前にJPEGへ変換する。
+      // fetch成功でbytesが手元にある＝blob:URL経由なのでcanvasは汚染されず再エンコード可。失敗時は元blobへフォールバック。
+      var BUYMA_OK = /^image\/(jpeg|png|gif)$/i;
+      var toBuymaBlob = function (b) {
+        if (!b || BUYMA_OK.test(b.type || '')) return Promise.resolve(b);
+        return new Promise(function (resolve) {
+          var url, img = new Image();
+          var fin = function (out) { try { URL.revokeObjectURL(url); } catch (e) {} resolve(out && out.size ? out : b); };
+          img.onload = function () {
+            try {
+              var c = document.createElement('canvas');
+              c.width = img.naturalWidth || img.width; c.height = img.naturalHeight || img.height;
+              if (!c.width || !c.height) return fin(b);
+              var ctx = c.getContext('2d');
+              ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); // 透過は白背景で平坦化（BUYMAも白余白）
+              ctx.drawImage(img, 0, 0);
+              c.toBlob(function (out) { fin(out); }, 'image/jpeg', 0.92);
+            } catch (e) { fin(b); }
+          };
+          img.onerror = function () { fin(b); };
+          try { url = URL.createObjectURL(b); img.src = url; } catch (e) { resolve(b); }
+        });
+      };
       root.querySelector('#__bm_send').onclick = function () {
         var ref = (root.querySelector('#__bm_ref').value || '').trim();
         var msgEl = root.querySelector('#__bm_msg');
@@ -180,6 +275,9 @@
         var urls = tiles().filter(function (t) { return t.getAttribute('data-sel') === '1'; })
           .map(function (t) { return decodeURIComponent(t.getAttribute('data-url')); });
         if (!urls.length) { msgEl.textContent = '画像を1枚以上選んでください'; return; }
+        var destUrl = (destFolderInp.value || '').trim();
+        if (dest === 'drive' && !destUrl) { msgEl.textContent = '保存先フォルダ(Drive)のURLを入力してください'; return; }
+        if (dest === 'drive') SHIRO.setDest('drive', destUrl); // 前回値を記憶
         var selSet = {};
         tiles().forEach(function (t) { if (t.getAttribute('data-sel') === '1') selSet[decodeURIComponent(t.getAttribute('data-url'))] = 1; });
         var logData = imgs.map(function (o) { return { url: o.url, w: o.w, h: o.h, strong: isProduct(o) ? 1 : 0, sel: selSet[o.url] ? 1 : 0 }; });
@@ -188,6 +286,7 @@
         msgEl.textContent = '画像を取得中… 0/' + urls.length;
         var grab = function (u) {
           return fetch(u).then(function (r) { if (!r.ok) throw new Error('http'); return r.blob(); })
+            .then(toBuymaBlob)
             .then(function (b) {
               return new Promise(function (res) {
                 var fr = new FileReader();
@@ -217,7 +316,7 @@
             sendBtn.disabled = false; sendBtn.style.opacity = '1';
             return;
           }
-          var payload = JSON.stringify({ ref: ref, images: items.map(function (it) { return { url: it.url, data: it.data, mime: it.mime }; }), key: KEY, page: location.href, host: location.host, log: logData });
+          var payload = JSON.stringify({ ref: ref, images: items.map(function (it) { return { url: it.url, data: it.data, mime: it.mime }; }), key: KEY, dest: destUrl, page: location.href, host: location.host, log: logData });
           var f = document.createElement('form');
           f.method = 'POST'; f.action = EXEC_URL; f.target = '_blank';
           var inp = document.createElement('input');
