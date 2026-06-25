@@ -182,13 +182,14 @@
       var strong = imgs.filter(isProduct);
       var rest = imgs.filter(function (o) { return !isProduct(o); });
       var anyStrong = strong.length > 0;
+      var confident = !!(RULE && RULE.token); // URLの区別語を学習済み＝高信頼の時だけ⭐を自動チェック。怪しい時は白紙にして「全解除地獄」を防ぐ
       var section = function (label, list, preselect) {
         if (!list.length) return '';
         return '<div style="margin:12px 0 2px;font-weight:bold;color:#333">' + label + '（' + list.length + '件）</div>'
           + '<div>' + list.map(function (o) { return tileHtml(o, preselect); }).join('') + '</div>';
       };
-      var cards = section((RULE ? '⭐ 有力候補（学習済み）' : '⭐ 有力候補（商品画像と思われる画像）'), strong, true)
-        + section(anyStrong ? 'その他の画像' : '検出画像', rest, !anyStrong);
+      var cards = section((confident ? '⭐ 有力候補（学習済み・自動チェック）' : (RULE ? '有力候補（クリックで選択）' : '検出画像（クリックで選択）')), strong, confident)
+        + section(anyStrong ? 'その他の画像' : '検出画像', rest, false);
       var root = panel(
         '<div style="display:flex;justify-content:space-between;align-items:center">'
         + '<b>BUYMA 画像取り込み</b>'
