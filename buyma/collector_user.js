@@ -278,7 +278,7 @@
             var prod = {}; (r.products || []).forEach(function (i) { prod[i] = 1; });
             var judged = {}; (r.judged || []).forEach(function (i) { judged[i] = 1; });
             vis.forEach(function (t, i) { if (judged[i]) setSel(t, !!prod[i]); }); // 判定済のみ反映・未判定は現状維持
-            finish((r.products || []).length + '枚をAIが商品と判定して選択しました' + (r.note ? '（' + r.note + '）' : '') + (r.error ? '（' + r.error + '）' : ''));
+            finish('AI判定：' + (r.judged || []).length + '枚を解析 → ' + (r.products || []).length + '枚を商品として選択' + (r.note ? '（' + r.note + '）' : '') + (r.error ? '（' + r.error + '）' : ''));
           };
           s.src = EXEC_URL + '?action=classify_result&job=' + encodeURIComponent(job) + '&cb=' + cb + '&t=' + Date.now();
           s.onerror = function () { if (s.parentNode) s.remove(); setTimeout(poll, 1500); };
