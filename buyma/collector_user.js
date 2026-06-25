@@ -259,7 +259,7 @@
         var items = vis.map(function (t, i) { return { i: i, url: decodeURIComponent(t.getAttribute('data-url')) }; });
         var job = 'j' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
         var old = aiBtn.textContent; aiBtn.disabled = true; aiBtn.textContent = '🤖 AI判定中…';
-        msgEl.textContent = 'AIが商品画像を判定中…（10〜20秒）';
+        msgEl.textContent = 'AIが商品画像を判定中…（枚数が多いと最大1分・お待ちください）';
         var ifr = document.createElement('iframe'); ifr.name = '__bm_cls_' + job; ifr.style.display = 'none'; document.body.appendChild(ifr);
         var f = document.createElement('form'); f.method = 'POST'; f.action = EXEC_URL; f.target = ifr.name;
         var inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'payload';
@@ -268,7 +268,7 @@
         var tries = 0;
         var finish = function (msg) { aiBtn.disabled = false; aiBtn.textContent = old; if (msg) msgEl.textContent = msg; try { ifr.remove(); } catch (e) {} };
         var poll = function () {
-          if (++tries > 30) { finish('AI判定がタイムアウトしました。手動で選んでください'); return; }
+          if (++tries > 48) { finish('AI判定がタイムアウトしました。手動で選んでください'); return; }
           var cb = '__bmCls_' + job.replace(/[^\w]/g, '') + '_' + tries;
           var s = document.createElement('script');
           window[cb] = function (r) {
