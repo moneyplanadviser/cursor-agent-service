@@ -205,7 +205,8 @@
         + '<span class="__bm_dest" data-v="drive" style="display:inline-block;padding:3px 10px;border-radius:14px;cursor:pointer;margin-right:4px;background:#1a73e8;color:#fff">自分のGoogle Drive</span>'
         + '<span class="__bm_dest" data-v="local" style="display:inline-block;padding:3px 10px;border-radius:14px;cursor:pointer;background:#eee;color:#333">このPCにDL</span>'
         + '<span style="margin-left:10px">クリックで選択（計' + imgs.length + '件）'
-        + ' <a href="#" id="__bm_all">全選択</a>/<a href="#" id="__bm_none">全解除</a></span></div>'
+        + ' <a href="#" id="__bm_all">全選択</a>/<a href="#" id="__bm_none">全解除</a></span>'
+        + ' <button id="__bm_ai" style="margin-left:8px;background:#6a1b9a;color:#fff;border:0;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer">🤖 AIで商品だけ選ぶ</button></div>'
         + '<div id="__bm_destrow" style="margin-top:6px;color:#666;font-size:13px">保存先：あなたのGoogle Driveの「BUYMA画像取込」フォルダに自動保存されます（共有・URL入力は不要）。'
         + '<input id="__bm_destfolder" type="hidden"></div></div>'
         + '<div style="padding-top:8px">' + cards + '</div>');
@@ -246,6 +247,45 @@
       root.querySelector('#__bm_close').onclick = function () { root.remove(); window.__buymaImgPicker = null; };
       root.querySelector('#__bm_all').onclick = function (ev) { ev.preventDefault(); tiles().forEach(function (t) { setSel(t, true); }); };
       root.querySelector('#__bm_none').onclick = function (ev) { ev.preventDefault(); tiles().forEach(function (t) { setSel(t, false); }); };
+      // C: AIで商品だけ選ぶ（候補URL＋検索キーワードをGASへ→Geminiが商品判定→該当だけ✓。未判定は現状維持）
+      var KW = '';
+      try { KW = new URLSearchParams(location.search).get('keyword') || new URLSearchParams(location.search).get('q') || ''; } catch (e) {}
+      var aiBtn = root.querySelector('#__bm_ai');
+      if (aiBtn) aiBtn.onclick = function (ev) {
+        ev.preventDefault();
+        var msgEl = root.querySelector('#__bm_msg');
+        var vis = tiles().filter(function (t) { return t.style.display !== 'none'; });
+        if (!vis.length) { msgEl.textContent = '判定する画像がありません'; return; }
+        var items = vis.map(function (t, i) { return { i: i, url: decodeURIComponent(t.getAttribute('data-url')) }; });
+        var job = 'j' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+        var old = aiBtn.textContent; aiBtn.disabled = true; aiBtn.textContent = '🤖 AI判定中…';
+        msgEl.textContent = 'AIが商品画像を判定中…（10〜20秒）';
+        var ifr = document.createElement('iframe'); ifr.name = '__bm_cls_' + job; ifr.style.display = 'none'; document.body.appendChild(ifr);
+        var f = document.createElement('form'); f.method = 'POST'; f.action = EXEC_URL; f.target = ifr.name;
+        var inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'payload';
+        inp.value = JSON.stringify({ classify: 1, job: job, key: KEY, keyword: KW, page: location.href, host: location.host, items: items });
+        f.appendChild(inp); document.body.appendChild(f); f.submit(); f.remove();
+        var tries = 0;
+        var finish = function (msg) { aiBtn.disabled = false; aiBtn.textContent = old; if (msg) msgEl.textContent = msg; try { ifr.remove(); } catch (e) {} };
+        var poll = function () {
+          if (++tries > 30) { finish('AI判定がタイムアウトしました。手動で選んでください'); return; }
+          var cb = '__bmCls_' + job.replace(/[^\w]/g, '') + '_' + tries;
+          var s = document.createElement('script');
+          window[cb] = function (r) {
+            try { delete window[cb]; } catch (e) {} if (s.parentNode) s.remove();
+            if (!r || !r.ready) { setTimeout(poll, 1500); return; }
+            if (r.error === 'auth') { finish('鍵エラーで判定できませんでした'); return; }
+            var prod = {}; (r.products || []).forEach(function (i) { prod[i] = 1; });
+            var judged = {}; (r.judged || []).forEach(function (i) { judged[i] = 1; });
+            vis.forEach(function (t, i) { if (judged[i]) setSel(t, !!prod[i]); }); // 判定済のみ反映・未判定は現状維持
+            finish((r.products || []).length + '枚をAIが商品と判定して選択しました' + (r.note ? '（' + r.note + '）' : '') + (r.error ? '（' + r.error + '）' : ''));
+          };
+          s.src = EXEC_URL + '?action=classify_result&job=' + encodeURIComponent(job) + '&cb=' + cb + '&t=' + Date.now();
+          s.onerror = function () { if (s.parentNode) s.remove(); setTimeout(poll, 1500); };
+          document.body.appendChild(s);
+        };
+        setTimeout(poll, 2500);
+      };
       var extOf = function (mime, u) {
         mime = mime || '';
         if (mime.indexOf('png') >= 0) return 'png';
