@@ -165,7 +165,7 @@
           + '<span class="__bm_chk" style="position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;color:#fff;font-size:14px;line-height:22px;text-align:center;background:' + (sel ? '#1a73e8' : 'rgba(0,0,0,.35)') + '">' + (sel ? '✓' : '') + '</span>'
           + '<span style="display:block;font-size:11px;color:#888">' + (o.w ? o.w + 'px' : '?') + '</span></div>';
       };
-      var JUNK = /(visa|mastercard|maestro|amex|american[-_]?express|alipay|wechat|unionpay|union[-_]?pay|jcb|klarna|paypal|apple[-_ ]?pay|google[-_ ]?pay|g[-_]?pay|discover|diners|sofort|ideal|payment|sprite|favicon|placeholder|\blogo\b|\bicon\b|\bflag\b|\bbadge\b)/i;
+      var JUNK = /(visa|mastercard|maestro|amex|american[-_]?express|alipay|wechat|unionpay|union[-_]?pay|jcb|klarna|paypal|apple[-_ ]?pay|google[-_ ]?pay|g[-_]?pay|discover|diners|sofort|ideal|payment|sprite|favicon|placeholder|\blogo\b|\bicon\b|\bflag\b|\bbadge\b|avatar|profile|qrcode|qr[-_]?code|emoji|sticker|spinner|loading)/i;
       var RULE = (RULES && RULES[location.host]) || null;
       var isProduct = function (o) {
         if (JUNK.test(o.url)) return false;
@@ -234,6 +234,15 @@
         c.textContent = on ? '✓' : '';
       };
       tiles().forEach(function (t) { t.onclick = function () { setSel(t, t.getAttribute('data-sel') !== '1'); }; });
+      // 読み込めない画像（壊れ・hotlink拒否・空タイル）は候補から自動除外（選択解除＋非表示）
+      tiles().forEach(function (t) {
+        var im = t.querySelector('img');
+        if (!im) return;
+        var bad = function () { setSel(t, false); t.style.display = 'none'; };
+        if (im.complete && im.naturalWidth === 0) bad();
+        im.addEventListener('error', bad);
+        im.addEventListener('load', function () { if (im.naturalWidth === 0) bad(); });
+      });
       root.querySelector('#__bm_close').onclick = function () { root.remove(); window.__buymaImgPicker = null; };
       root.querySelector('#__bm_all').onclick = function (ev) { ev.preventDefault(); tiles().forEach(function (t) { setSel(t, true); }); };
       root.querySelector('#__bm_none').onclick = function (ev) { ev.preventDefault(); tiles().forEach(function (t) { setSel(t, false); }); };
@@ -247,6 +256,30 @@
         return m ? m[1].toLowerCase().replace('jpeg', 'jpg') : 'jpg';
       };
       var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+      // ローカルDLは個別だと Downloads に散らばり名前も重複(〇〇(1))しがち → 1つのZIP(参照番号.zip)にまとめる。
+      var crc32 = function (u8) {
+        var t = crc32._t;
+        if (!t) { t = crc32._t = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; } }
+        var crc = 0xFFFFFFFF;
+        for (var i = 0; i < u8.length; i++) crc = (crc >>> 8) ^ t[(crc ^ u8[i]) & 0xFF];
+        return (crc ^ 0xFFFFFFFF) >>> 0;
+      };
+      var makeZip = function (files) {  // files:[{name,bytes(Uint8Array)}] → store方式(無圧縮)のZip Blob。jpgは既に圧縮済なので無圧縮で十分。
+        var enc = new TextEncoder(), parts = [], central = [], offset = 0;
+        var u16 = function (n) { return [n & 0xFF, (n >>> 8) & 0xFF]; };
+        var u32 = function (n) { return [n & 0xFF, (n >>> 8) & 0xFF, (n >>> 16) & 0xFF, (n >>> 24) & 0xFF]; };
+        files.forEach(function (f) {
+          var name = enc.encode(f.name), data = f.bytes, crc = crc32(data);
+          var lh = [].concat(u32(0x04034b50), u16(20), u16(0), u16(0), u16(0), u16(0), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+          parts.push(new Uint8Array(lh), name, data);
+          var ch = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0), u16(0), u16(0), u16(0), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset));
+          central.push(new Uint8Array(ch), name);
+          offset += lh.length + name.length + data.length;
+        });
+        var cdSize = 0; central.forEach(function (c) { cdSize += c.length; });
+        var eocd = [].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cdSize), u32(offset), u16(0));
+        return new Blob(parts.concat(central, [new Uint8Array(eocd)]), { type: 'application/zip' });
+      };
       // BUYMAは JPEG/PNG/GIF のみ対応（WebP/AVIF不可）。非対応形式は保存前にJPEGへ変換する。
       // fetch成功でbytesが手元にある＝blob:URL経由なのでcanvasは汚染されず再エンコード可。失敗時は元blobへフォールバック。
       var BUYMA_OK = /^image\/(jpeg|png|gif)$/i;
@@ -300,20 +333,24 @@
         };
         Promise.all(urls.map(grab)).then(function (items) {
           if (dest === 'local') {
-            var n = 0;
-            items.forEach(function (it) {
-              if (!it.blob) return;
-              n++;
-              var a = document.createElement('a');
-              a.href = URL.createObjectURL(it.blob);
-              a.download = ref + '_' + pad2(n) + '.' + extOf(it.mime, it.url);
-              document.body.appendChild(a); a.click(); a.remove();
-              setTimeout(function (h) { return function () { URL.revokeObjectURL(h); }; }(a.href), 10000);
+            var got = items.filter(function (it) { return it.blob; });
+            var ng = items.length - got.length;
+            Promise.all(got.map(function (it, i) {
+              return it.blob.arrayBuffer().then(function (ab) {
+                return { name: ref + '_' + pad2(i + 1) + '.' + extOf(it.mime, it.url), bytes: new Uint8Array(ab) };
+              });
+            })).then(function (files) {
+              if (files.length) {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(makeZip(files));
+                a.download = ref + '.zip';
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(function (h) { return function () { URL.revokeObjectURL(h); }; }(a.href), 10000);
+              }
+              try { navigator.sendBeacon(EXEC_URL, JSON.stringify({ logOnly: 1, host: location.host, ref: ref, key: KEY, log: logData })); } catch (e) {}
+              msgEl.textContent = files.length ? (files.length + '枚を ' + ref + '.zip にまとめてダウンロードしました' + (ng ? '（' + ng + '件は取得不可）' : '')) : '取得できた画像がありませんでした';
+              sendBtn.disabled = false; sendBtn.style.opacity = '1';
             });
-            var ng = items.length - n;
-            try { navigator.sendBeacon(EXEC_URL, JSON.stringify({ logOnly: 1, host: location.host, ref: ref, key: KEY, log: logData })); } catch (e) {}
-            msgEl.textContent = n + '枚をダウンロード' + (ng ? '（' + ng + '件は取得不可）' : '');
-            sendBtn.disabled = false; sendBtn.style.opacity = '1';
             return;
           }
           var payload = JSON.stringify({ ref: ref, images: items.map(function (it) { return { url: it.url, data: it.data, mime: it.mime }; }), key: KEY, dest: destUrl, page: location.href, host: location.host, log: logData });
