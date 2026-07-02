@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>業務ムダ時間 簡易診断 ｜ SHIRO</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#ffffff; --ink:#23211c; --sub:#6b6657;
+    --line:#e7e1d6; --accent:#1f3a5f; --accent2:#c8a85a; --good:#1f7a4d;
+    --soft:#f2eee6; --warn:#9a3b2f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto;padding:0 18px 80px}
+  header.hero{padding:40px 18px 28px;text-align:center}
+  .badge{display:inline-block;font-size:12px;letter-spacing:.12em;color:var(--accent);
+    border:1px solid var(--line);border-radius:999px;padding:5px 14px;background:#fff;margin-bottom:16px}
+  h1{font-size:25px;margin:6px 0 10px;letter-spacing:.01em}
+  h1 .big{color:var(--accent)}
+  .lead{color:var(--sub);font-size:15px;margin:0 auto;max-width:560px}
+  .progress{height:6px;background:var(--soft);border-radius:99px;margin:22px 0 0;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s ease}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 8px;margin:16px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .q .qno{font-size:12px;color:var(--accent2);font-weight:700;letter-spacing:.08em}
+  .q h3{font-size:16px;margin:4px 0 6px}
+  .q .sub{font-size:12px;color:var(--sub);margin:0 0 12px}
+  .opts{display:grid;gap:8px}
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;cursor:pointer;transition:.15s;background:#fff}
+  .opt:hover{border-color:#cdbf9f;background:#fffdf8}
+  .opt input{accent-color:var(--accent);width:17px;height:17px;flex:0 0 auto}
+  .opt.sel{border-color:var(--accent);background:#f4f7fb}
+  textarea,input[type=text],input[type=email]{width:100%;border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;font:inherit;color:var(--ink);background:#fff}
+  textarea{resize:vertical;min-height:64px}
+  .gate{border:1px solid var(--accent);background:#f4f7fb}
+  .contact{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+  @media(max-width:520px){.contact{grid-template-columns:1fr}}
+  .hint{font-size:12px;color:var(--sub);margin:4px 2px 12px}
+  .cta{display:block;width:100%;border:none;border-radius:12px;background:var(--accent);color:#fff;
+    font-size:17px;font-weight:700;padding:16px;margin:8px 0 4px;cursor:pointer;transition:.15s}
+  .cta:hover{background:#16304f}
+  .micro{text-align:center;color:var(--sub);font-size:12px;margin:8px 0 0}
+  /* result */
+  #result{display:none;margin-top:10px}
+  .rcard{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .rtop{background:linear-gradient(135deg,#1f3a5f,#2c4f7c);color:#fff;padding:26px 22px;text-align:center}
+  .rtop .label{font-size:13px;opacity:.85;letter-spacing:.08em}
+  .rtop .num{font-size:40px;font-weight:800;margin:6px 0 2px}
+  .rtop .num small{font-size:18px;font-weight:600}
+  .rtop .yen{font-size:14px;opacity:.92;margin-top:4px}
+  .coi{background:#fdf3ef;border-bottom:1px solid #f0d9d1;color:var(--warn);font-size:14px;
+    padding:12px 22px;text-align:center;font-weight:600}
+  .rbody{padding:20px 22px}
+  .rrow{padding:14px 0;border-bottom:1px dashed var(--line)}
+  .rrow:last-child{border-bottom:none}
+  .rrow .k{font-size:12px;color:var(--accent2);font-weight:700;letter-spacing:.06em}
+  .rrow .v{font-size:15px;margin-top:3px}
+  .rrow .v b{color:var(--accent)}
+  .pill{display:inline-block;font-size:12px;font-weight:700;border-radius:99px;padding:3px 10px;margin-left:6px}
+  .pill.hi{background:#fde8e3;color:var(--warn)} .pill.mid{background:#fbf2dc;color:#8a6a1f} .pill.lo{background:#e6f1ea;color:var(--good)}
+  .ba{background:var(--soft);border-radius:10px;padding:11px 13px;font-size:14px;margin-top:8px}
+  .closing{background:#fffdf8;border:1px solid #ece3cf;border-radius:14px;padding:18px;margin-top:16px;text-align:center}
+  .closing .ready{font-weight:700;color:var(--accent);margin:0 0 8px;font-size:15px}
+  .closing p{margin:0 0 14px;font-size:15px;color:var(--ink)}
+  .closing .note{color:var(--sub);font-size:13px}
+  footer{text-align:center;color:var(--sub);font-size:12px;margin-top:30px}
+  .err{color:#b23b3b;font-size:13px;text-align:center;margin:6px 0;min-height:18px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="badge">SHIRO ｜ 一人ビジネスの自動化</div>
+  <h1>あなたが“手作業でやっている”その作業、<br><span class="big">月に何時間</span>ムダにしているか？</h1>
+  <p class="lead">6問・約2分。毎日の繰り返し作業で失っている時間を概算し、どこから自動化すると一番効くかをその場でお出しします。</p>
+  <div class="progress"><i id="bar"></i></div>
+</header>
+
+<main class="wrap">
+  <form id="form" novalidate>
+
+    <div class="q" data-q>
+      <div class="qno">Q1</div>
+      <h3>どんな事業をされていますか？</h3>
+      <div class="opts" data-name="seg">
+        <label class="opt"><input type="radio" name="seg" value="物販・EC"><span>物販・EC（モール／ネットショップ）</span></label>
+        <label class="opt"><input type="radio" name="seg" value="店舗・サロン・教室"><span>店舗・サロン・教室</span></label>
+        <label class="opt"><input type="radio" name="seg" value="オンラインサービス・コンサル"><span>オンラインサービス・コンサル</span></label>
+        <label class="opt"><input type="radio" name="seg" value="コンテンツ・クリエイター"><span>コンテンツ・クリエイター</span></label>
+        <label class="opt"><input type="radio" name="seg" value="その他"><span>その他</span></label>
+      </div>
+    </div>
+
+    <div class="q" data-q>
+      <div class="qno">Q2</div>
+      <h3>いちばん時間を取られている “繰り返し作業” は？</h3>
+      <p class="sub">当てはまるものを全部選んでください（複数可）</p>
+      <div class="opts" data-name="area">
+        <label class="opt"><input type="checkbox" name="area" value="rece"><span>受注・発送の処理（情報の転記・連絡）</span></label>
+        <label class="opt"><input type="checkbox" name="area" value="stock"><span>在庫・価格の更新</span></label>
+        <label class="opt"><input type="checkbox" name="area" value="list"><span>出品・商品登録</span></label>
+        <label class="opt"><input type="checkbox" name="area" value="reply"><span>問い合わせ・メッセージ返信</span></label>
+        <label class="opt"><input type="checkbox" name="area" value="sns"><span>SNS投稿・コンテンツ作成</span></label>
+        <label class="opt"><input type="checkbox" name="area" value="keiri"><span>売上集計・経理・請求</span></label>
+        <label class="opt"><input type="checkbox" name="area" value="dup"><span>同じ情報を “あちこちに打ち直し”（二重入力・転記）</span></label>
+        <label class="opt"><input type="checkbox" name="area" value="other"><span>その他</span></label>
+      </div>
+    </div>
+
+    <div class="q" data-q>
+      <div class="qno">Q3</div>
+      <h3>その作業に、週どれくらい使っていますか？</h3>
+      <div class="opts" data-name="hours">
+        <label class="opt"><input type="radio" name="hours" value="0-2"><span>〜2時間</span></label>
+        <label class="opt"><input type="radio" name="hours" value="2-5"><span>2〜5時間</span></label>
+        <label class="opt"><input type="radio" name="hours" value="5-10"><span>5〜10時間</span></label>
+        <label class="opt"><input type="radio" name="hours" value="10+"><span>10時間以上</span></label>
+      </div>
+    </div>
+
+    <div class="q" data-q>
+      <div class="qno">Q4</div>
+      <h3>その作業は、毎回ほぼ同じ手順ですか？</h3>
+      <div class="opts" data-name="teikei">
+        <label class="opt"><input type="radio" name="teikei" value="yes"><span>はい、だいたい決まった手順</span></label>
+        <label class="opt"><input type="radio" name="teikei" value="mostly"><span>半分くらいは決まっている</span></label>
+        <label class="opt"><input type="radio" name="teikei" value="no"><span>毎回その都度の判断が多い</span></label>
+      </div>
+    </div>
+
+    <div class="q" data-q>
+      <div class="qno">Q5</div>
+      <h3>あなたが手を止めると、その作業は回らなくなりますか？</h3>
+      <div class="opts" data-name="zokujin">
+        <label class="opt"><input type="radio" name="zokujin" value="yes"><span>はい、自分しかできない</span></label>
+        <label class="opt"><input type="radio" name="zokujin" value="partly"><span>一部は人に任せられる</span></label>
+        <label class="opt"><input type="radio" name="zokujin" value="no"><span>いいえ、誰でも回せる</span></label>
+      </div>
+    </div>
+
+    <div class="q" data-q>
+      <div class="qno">Q6</div>
+      <h3>ツールやAIでの自動化を試したことは？</h3>
+      <div class="opts" data-name="exp">
+        <label class="opt"><input type="radio" name="exp" value="never"><span>やったことがない</span></label>
+        <label class="opt"><input type="radio" name="exp" value="failed"><span>試したが続かなかった／挫折した</span></label>
+        <label class="opt"><input type="radio" name="exp" value="some"><span>一部は使えている</span></label>
+      </div>
+    </div>
+
+    <div class="q" data-q>
+      <div class="qno">あと一歩（任意）</div>
+      <h3>その作業が楽になったら、空いた時間で何をしたいですか？</h3>
+      <textarea name="want" placeholder="例：本業の商品開発に集中したい／早く帰りたい など"></textarea>
+    </div>
+
+    <div class="q gate">
+      <div class="qno">結果を見る</div>
+      <h3>診断結果の送り先を入力してください</h3>
+      <div class="contact">
+        <input type="text" id="name" placeholder="お名前">
+        <input type="email" id="email" placeholder="メールアドレス">
+      </div>
+      <p class="hint">この場で結果を表示します。結果と相談枠のご案内をお送りします。</p>
+    </div>
+
+    <div class="err" id="err"></div>
+    <button type="submit" class="cta" id="submit">診断結果を見る</button>
+    <p class="micro">所要約2分 ／ 無料 ／ 結果はその場で表示されます</p>
+  </form>
+
+  <section id="result">
+    <div class="rcard">
+      <div class="rtop">
+        <div class="label">あなたのムダ時間（概算）</div>
+        <div class="num"><span id="r-year">―</span><small> 時間 / 年</small></div>
+        <div class="yen">月 約<span id="r-month">―</span>時間 ／ 時給2,000円換算で 年 約<b id="r-yen">―</b>万円ぶん</div>
+      </div>
+      <div class="coi" id="r-coi">―</div>
+      <div class="rbody">
+        <div class="rrow">
+          <div class="k">まず自動化すべき作業</div>
+          <div class="v" id="r-area">―</div>
+          <div class="ba" id="r-ba">―</div>
+        </div>
+        <div class="rrow">
+          <div class="k">自動化のしやすさ</div>
+          <div class="v"><b id="r-teikei">―</b><br><span id="r-teikei-msg" style="font-size:14px;color:var(--sub)">―</span></div>
+        </div>
+        <div class="rrow">
+          <div class="k">属人リスク<span class="pill" id="r-zoku-pill">―</span></div>
+          <div class="v" id="r-zoku-msg" style="font-size:14px;color:var(--sub)">―</div>
+        </div>
+        <div class="rrow">
+          <div class="k">ひとことアドバイス</div>
+          <div class="v" id="r-exp">―</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="closing">
+      <p class="ready" id="r-ready">―</p>
+      <p id="r-want" style="display:none;font-weight:700;color:var(--accent);margin:0 0 12px"></p>
+      <p>30分・無料。これは「相談」ではなく、<br><b>あなた専用の“業務自動化ロードマップ（設計図）”を一緒に作る場</b>です。<br>診断結果をもとに、どの作業を・どの順番で・どうやって自動化するかを、その場で具体化します。</p>
+      <a class="cta" id="book" href="#" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">業務自動化ロードマップ作成会に申し込む（30分・無料）</a>
+      <p class="note">一人で全部やらなくて大丈夫です。設計図だけでも持ち帰ってください。</p>
+    </div>
+  </section>
+
+  <footer>© SHIRO ／ 一人ビジネスに、AIの城と白い時間を。</footer>
+</main>
+
+<script>
+  // ===== 設定 =====
+  // 既存の SHIRO 無料相談 予約フォーム（shiro.ai.adviser）。差し替え可。
+  var BOOKING_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc_6NARKqJGvifQo8-t3lmFaelY_PEMdiwPwpGq0IN2Q-rtKg/viewform";
+  // 診断回答の記録＋即時結果メール＋追いかけのGAS（SHIRO診断リード Webhook / shiro.ai.adviser）。版付きデプロイv5。
+  var LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbwkahdScBUyhUAsZhm_-YyK1GV0qkc_lGnXUI5--rf3MOGqc1XwHTiyMJzV34vqQVQ9/exec";
+
+  // ===== ロジックテーブル =====
+  var WEEK = {"0-2":1.5,"2-5":3.5,"5-10":7.5,"10+":12};
+  // 自動化効果の高い順（まず着手すべき作業の優先度）
+  var AREA_PRI = ["dup","rece","stock","list","keiri","reply","sns","other"];
+  var AREA = {
+    dup:{name:"同じ情報の二重入力・転記", ba:"複数の場所への打ち直し → 1か所入れれば各所に自動反映。二重入力がゼロに。（自動化の効果がいちばん高い作業です）"},
+    rece:{name:"受注・発送の処理", ba:"注文を目視で転記 → ステータス連動で発送連絡・在庫更新まで自動化。"},
+    stock:{name:"在庫・価格の更新", ba:"手で更新 → 一括・自動更新で反映漏れと張り付きをなくす。"},
+    list:{name:"出品・商品登録", ba:"1点ずつ手入力 → 元データを流し込むと説明文・画像・出品まで自動。1商品10分が約1分に。"},
+    keiri:{name:"売上集計・経理・請求", ba:"各モールの明細を手集計 → 自動で取り込み・会計ソフト形式に変換。"},
+    reply:{name:"問い合わせ・メッセージ返信", ba:"都度の手返信 → 定型はテンプレ＋AIで下書き、予約は自動で日程確定。"},
+    sns:{name:"SNS投稿・コンテンツ作成", ba:"毎回ゼロから作成 → 素材から下書きを量産＋予約投稿で「考える時間」だけ残す。"},
+    other:{name:"その作業", ba:"まず作業を分解し、自動化できる定型部分を切り出します。"}
+  };
+  var TEIKEI = {
+    yes:{name:"自動化しやすい（定型ルーティン）", msg:"毎回ほぼ同じ手順＝そのまま自動化に乗せやすい状態です。"},
+    mostly:{name:"あと一歩で自動化できる", msg:"半分は決まった手順。少し整えれば自動化できます。"},
+    no:{name:"まず手順の棚卸しから", msg:"その都度の判断が多いぶん、定型部分を切り出すところから始めます。"}
+  };
+  var ZOKU = {
+    yes:{pill:"高い", cls:"hi", msg:"あなたが倒れると止まる作業です。自動化・仕組み化の優先度が高い状態。"},
+    partly:{pill:"ややあり", cls:"mid", msg:"一部は任せられても、肝心なところが属人化しています。"},
+    no:{pill:"低い", cls:"lo", msg:"回せる体制はある。あとは手間を減らす自動化が効きます。"}
+  };
+  var EXP = {
+    never:"はじめの一歩を、最初の1つから一緒に立ち上げます。",
+    failed:"続かなかった原因は、道具ではなく“設計と伴走”です。そこを一緒に。",
+    some:"点を線にすると効きます。今ある道具を繋いで自動化を伸ばしましょう。"
+  };
+
+  // ===== UI挙動 =====
+  var form = document.getElementById('form');
+  var bar = document.getElementById('bar');
+  var requiredRadios = ['seg','hours','teikei','zokujin','exp'];
+  var TOTAL = 6; // 5ラジオ + areaチェック群
+
+  function radio(name){var el=form.querySelector('input[name="'+name+'"]:checked');return el?el.value:null;}
+  function areasChecked(){return Array.prototype.slice.call(form.querySelectorAll('input[name="area"]:checked')).map(function(i){return i.value;});}
+  function answered(){var n=requiredRadios.filter(function(g){return radio(g);}).length; if(areasChecked().length) n++; return n;}
+
+  form.addEventListener('change', function(e){
+    var t=e.target; if(!t.name) return;
+    if(t.type==='radio'){
+      form.querySelectorAll('input[name="'+t.name+'"]').forEach(function(i){var o=i.closest('.opt'); if(o) o.classList.toggle('sel', i.checked);});
+    }else if(t.type==='checkbox'){
+      var o=t.closest('.opt'); if(o) o.classList.toggle('sel', t.checked);
+    }
+    bar.style.width = Math.round(answered()/TOTAL*100)+'%';
+  });
+
+  function calc(){
+    var week = WEEK[radio('hours')] || 0;
+    var month = Math.round(week*4.3);
+    var year = Math.round(week*4.3*12);
+    var yen = Math.round(year*2000/10000); // 万円
+    return {month:month, year:year, yen:yen};
+  }
+  function primaryArea(arr){for(var i=0;i<AREA_PRI.length;i++){if(arr.indexOf(AREA_PRI[i])>=0)return AREA_PRI[i];}return 'other';}
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var err = document.getElementById('err');
+    var miss = requiredRadios.filter(function(g){return !radio(g);});
+    var email = document.getElementById('email').value.trim();
+    if(!areasChecked().length){ err.textContent='Q2で、当てはまる作業を1つ以上選んでください。'; return; }
+    if(miss.length){ err.textContent='Q1〜Q6にお答えください。'; return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ err.textContent='結果送付用のメールアドレスをご確認ください。'; return; }
+    err.textContent='';
+
+    var c = calc();
+    var areas = areasChecked();
+    var area = AREA[primaryArea(areas)] || AREA.other;
+    var teikei = TEIKEI[radio('teikei')] || TEIKEI.mostly;
+    var zoku = ZOKU[radio('zokujin')] || ZOKU.partly;
+    var expMsg = EXP[radio('exp')] || '';
+
+    document.getElementById('r-year').textContent = c.year;
+    document.getElementById('r-month').textContent = c.month;
+    document.getElementById('r-yen').textContent = c.yen;
+    document.getElementById('r-coi').textContent = 'このまま1年続けると、約'+c.yen+'万円ぶんの時間が消えます。失っているのは時間だけではありません。本来あなたが戦略や商品に使うべき集中力も、毎日この作業に削られ続けています。';
+    document.getElementById('r-area').textContent = area.name + (areas.length>1 ? '（ほか'+(areas.length-1)+'件）' : '');
+    document.getElementById('r-ba').textContent = area.ba;
+    document.getElementById('r-teikei').textContent = teikei.name;
+    document.getElementById('r-teikei-msg').textContent = teikei.msg;
+    var pill = document.getElementById('r-zoku-pill'); pill.textContent = zoku.pill; pill.className = 'pill '+zoku.cls;
+    document.getElementById('r-zoku-msg').textContent = zoku.msg;
+    document.getElementById('r-exp').textContent = expMsg;
+    document.getElementById('book').setAttribute('href', BOOKING_URL);
+
+    // 準備度でクロージング文を出し分け
+    var hot = (radio('hours')==='5-10' || radio('hours')==='10+') || radio('zokujin')==='yes' || radio('exp')==='failed';
+    document.getElementById('r-ready').textContent = hot
+      ? '先延ばしにするほど、この損失は毎日積み上がります。いちばん効くここから、先に手を打ちましょう。'
+      : 'まずは気軽に。一番ラクになりそうな1つから一緒に見ていきましょう。';
+
+    // 「手に入れたい未来」を鏡で返す（Q6に記入があれば）
+    var want = form.want.value.trim();
+    if(want){
+      var w = document.getElementById('r-want');
+      w.textContent = '「'+want+'」。その時間を、取り戻しにいきましょう。';
+      w.style.display = 'block';
+    }
+
+    if(LEAD_ENDPOINT){
+      try{
+        fetch(LEAD_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            name:document.getElementById('name').value.trim(), email:email,
+            seg:radio('seg'), areas:areas, hours:radio('hours'),
+            teikei:radio('teikei'), zokujin:radio('zokujin'), exp:radio('exp'),
+            want:form.want.value.trim(), year:c.year, yen:c.yen, area:area.name, hot:hot
+          })});
+      }catch(_){}
+    }
+
+    form.style.display='none';
+    document.getElementById('result').style.display='block';
+    bar.style.width='100%';
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+</script>
+</body>
+</html>
