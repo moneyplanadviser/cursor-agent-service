@@ -306,6 +306,70 @@
     }
     .error-msg.show { display: block; }
 
+    /* ─── WORKLOG（診断・作業棚卸し） ─── */
+    .worklog-head,
+    .worklog-row {
+      display: grid;
+      grid-template-columns: 1fr 68px 68px 80px 30px;
+      gap: 8px;
+      align-items: center;
+    }
+    .worklog-head {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      padding: 0 2px;
+    }
+    .worklog { display: flex; flex-direction: column; gap: 8px; }
+    .worklog-row input,
+    .worklog-row select {
+      padding: 10px 10px;
+      font-size: 14px;
+    }
+    .wl-remove {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+    .wl-remove:hover { color: #c0392b; }
+    .wl-add {
+      margin-top: 12px;
+      width: 100%;
+      background: var(--accent-soft);
+      color: var(--navy2);
+      border: 1.5px dashed var(--navy2);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .wl-add:hover { opacity: 0.85; }
+
+    /* ─── DIAGNOSIS（診断結果） ─── */
+    .diagnosis {
+      background: var(--accent-soft);
+      border-radius: var(--radius-sm);
+      padding: 24px;
+      margin: 0 auto 28px;
+      max-width: 460px;
+      text-align: center;
+    }
+    .diagnosis .big { font-size: clamp(22px, 5vw, 28px); font-weight: 700; color: var(--navy); }
+    .diagnosis .big span { color: #c0392b; }
+    .diagnosis .sub { font-size: 14px; color: var(--muted); margin-top: 10px; line-height: 1.7; }
+
+    @media (max-width: 480px) {
+      .worklog-head,
+      .worklog-row { grid-template-columns: 1fr 52px 52px 64px 26px; gap: 6px; }
+      .worklog-row input, .worklog-row select { padding: 9px 7px; font-size: 13px; }
+    }
+
     /* ─── FOOTER ─── */
     footer {
       text-align: center;
@@ -386,13 +450,21 @@
       </div>
     </div>
 
-    <!-- STEP 4: 困っていること -->
+    <!-- STEP 4: 作業棚卸し（診断） -->
     <div class="step" id="step-4">
       <div class="step-num">Q4</div>
-      <div class="step-question">今、いちばん時間を取られている作業は何ですか？</div>
-      <div class="step-sub">「毎週この作業に何時間も…」というものがあれば、ぜひ教えてください。</div>
-      <textarea id="q_pain" placeholder="例：見積書・請求書の作成と管理。クライアントへのメール返信。SNSの投稿管理…など"></textarea>
-      <div class="error-msg" id="err-4">入力してください</div>
+      <div class="step-question">毎週くりかえす「手作業」を棚卸ししましょう</div>
+      <div class="step-sub">思いつくものを追加してください。頻度と時間から、奪われている時間を自動で見える化します。</div>
+      <div class="worklog-head">
+        <div>作業の内容</div>
+        <div>週の回数</div>
+        <div>1回の分</div>
+        <div>つらさ</div>
+        <div></div>
+      </div>
+      <div class="worklog" id="worklog"></div>
+      <button type="button" class="wl-add" onclick="addWorkRow()">＋ 作業を追加</button>
+      <div class="error-msg" id="err-4">作業を1つ以上入力してください</div>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="next(4)">次へ →</button>
         <button class="btn btn-back" onclick="back(4)">← 戻る</button>
@@ -489,6 +561,7 @@
       <div class="complete-icon">
         <img src="assets/shiro-logo-ai-signal-icon-only-on-white.png" alt="SHIRO" style="width:48px;height:48px;object-fit:contain;">
       </div>
+      <div class="diagnosis" id="diagnosis" style="display:none;"></div>
       <h2>ありがとうございました！</h2>
       <p>
         ヒアリング内容を確認して、<strong>2営業日以内</strong>にご連絡します。<br>
@@ -510,6 +583,8 @@
   <input type="hidden" name="email"      id="hf_email">
   <input type="hidden" name="business"   id="hf_business">
   <input type="hidden" name="pain"       id="hf_pain">
+  <input type="hidden" name="worklog"    id="hf_worklog">
+  <input type="hidden" name="hours_per_week" id="hf_hours">
   <input type="hidden" name="wish"       id="hf_wish">
   <input type="hidden" name="tools"      id="hf_tools">
   <input type="hidden" name="intent"     id="hf_intent">
@@ -543,7 +618,7 @@
     if (step === 1) ok = document.getElementById('q_name').value.trim() !== '';
     if (step === 2) ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('q_email').value.trim());
     if (step === 3) ok = document.getElementById('q_business').value.trim() !== '';
-    if (step === 4) ok = document.getElementById('q_pain').value.trim() !== '';
+    if (step === 4) ok = getWorklog().length > 0;
     if (step === 5) ok = document.getElementById('q_wish').value.trim() !== '';
     if (step === 7) ok = document.querySelector('#q_intent .selected') !== null;
 
@@ -573,6 +648,52 @@
     el.classList.toggle('selected');
   }
 
+  // ─── 作業棚卸し（診断） ───
+  function addWorkRow(name = '', freq = '', mins = '', pain = '3') {
+    const wl = document.getElementById('worklog');
+    const row = document.createElement('div');
+    row.className = 'worklog-row';
+    row.innerHTML =
+      '<input type="text" class="wl-name" placeholder="例：出品作業 / SNS投稿">' +
+      '<input type="number" class="wl-freq" min="0" inputmode="numeric" placeholder="5">' +
+      '<input type="number" class="wl-mins" min="0" inputmode="numeric" placeholder="30">' +
+      '<select class="wl-pain">' +
+        '<option value="1">1</option><option value="2">2</option>' +
+        '<option value="3">3</option><option value="4">4</option><option value="5">5</option>' +
+      '</select>' +
+      '<button type="button" class="wl-remove" onclick="this.parentElement.remove()">×</button>';
+    wl.appendChild(row);
+    row.querySelector('.wl-name').value = name;
+    row.querySelector('.wl-freq').value = freq;
+    row.querySelector('.wl-mins').value = mins;
+    row.querySelector('.wl-pain').value = pain;
+  }
+
+  function getWorklog() {
+    const items = [];
+    document.querySelectorAll('#worklog .worklog-row').forEach(r => {
+      const name = r.querySelector('.wl-name').value.trim();
+      const freq = parseFloat(r.querySelector('.wl-freq').value) || 0;
+      const mins = parseFloat(r.querySelector('.wl-mins').value) || 0;
+      const pain = parseInt(r.querySelector('.wl-pain').value, 10) || 3;
+      if (name) items.push({ name, freq, mins, pain, weekMin: freq * mins });
+    });
+    return items;
+  }
+
+  function renderDiagnosis(items, weekHours) {
+    const monthly = Math.round(weekHours * 4.3);
+    const top = [...items].sort((a, b) => b.weekMin - a.weekMin)[0];
+    const topLine = top
+      ? 'まず自動化したいのは「' + top.name + '」（週 ' + (top.weekMin / 60).toFixed(1) + ' 時間）です。'
+      : '';
+    const el = document.getElementById('diagnosis');
+    el.innerHTML =
+      '<div class="big">手作業に <span>週 ' + weekHours.toFixed(1) + ' 時間</span></div>' +
+      '<div class="sub">月にすると約 ' + monthly + ' 時間。' + topLine + '<br>この時間を、AIエージェントで取り戻しましょう。</div>';
+    el.style.display = 'block';
+  }
+
   async function submit() {
     if (!validate(7)) return;
 
@@ -580,13 +701,24 @@
       .map(i => i.value).join('、') || 'なし';
     const intent = document.querySelector('#q_intent .selected input')?.value || '';
 
+    // 作業棚卸し → pain文・worklog・週あたり時間
+    const items = getWorklog();
+    const weekHours = items.reduce((s, i) => s + i.weekMin, 0) / 60;
+    const painText = items
+      .map(i => i.name + '（週' + i.freq + '回×' + i.mins + '分・つらさ' + i.pain + '）')
+      .join('、');
+
     document.getElementById('hf_name').value     = document.getElementById('q_name').value.trim();
     document.getElementById('hf_email').value    = document.getElementById('q_email').value.trim();
     document.getElementById('hf_business').value = document.getElementById('q_business').value.trim();
-    document.getElementById('hf_pain').value     = document.getElementById('q_pain').value.trim();
+    document.getElementById('hf_pain').value     = painText;
+    document.getElementById('hf_worklog').value  = JSON.stringify(items);
+    document.getElementById('hf_hours').value    = weekHours.toFixed(1);
     document.getElementById('hf_wish').value     = document.getElementById('q_wish').value.trim();
     document.getElementById('hf_tools').value    = tools;
     document.getElementById('hf_intent').value   = intent;
+
+    renderDiagnosis(items, weekHours);
 
     // Formspree fetch送信
     const form = document.getElementById('hiddenForm');
@@ -609,6 +741,8 @@
   }
 
   // 初期化
+  addWorkRow();
+  addWorkRow();
   updateProgress(1);
 </script>
 </body>

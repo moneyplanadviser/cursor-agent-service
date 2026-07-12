@@ -30,6 +30,7 @@
       background: var(--bg);
       color: var(--navy);
       line-height: 1.7;
+      overflow-x: hidden;
     }
 
     a { color: inherit; text-decoration: none; }
@@ -132,14 +133,14 @@
       margin-left: auto;
       margin-right: auto;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.08fr 0.92fr;
       align-items: center;
       padding: 80px 48px;
-      gap: 40px;
+      gap: 56px;
       overflow: hidden;
       position: relative;
     }
-    .hero-left { max-width: 560px; }
+    .hero-left { max-width: 620px; min-width: 0; }
     .hero-label {
       display: flex;
       align-items: center;
@@ -158,31 +159,20 @@
       background: var(--navy);
     }
     .hero h1 {
-      font-size: 2.6rem;
+      font-size: 3rem;
       font-weight: 900;
-      line-height: 1.25;
+      line-height: 1.18;
       letter-spacing: 0;
       color: var(--navy);
-      margin-bottom: 16px;
-    }
-    .hero-hook {
-      font-size: 2rem;
-      font-weight: 800;
-      line-height: 1.25;
-      letter-spacing: 0;
-      color: var(--navy);
-      margin-bottom: 20px;
-    }
-    .hero-hook em {
-      font-style: normal;
-      color: #3b5998;
+      margin-bottom: 28px;
     }
     .hero-sub {
       font-size: 1rem;
       color: var(--muted);
       line-height: 1.8;
       margin-bottom: 40px;
-      max-width: 440px;
+      max-width: 480px;
+      overflow-wrap: anywhere;
     }
     .hero-btns {
       display: flex;
@@ -551,10 +541,12 @@
     @media (max-width: 768px) {
       .header-bar { padding: 0 24px; }
       nav { display: none; }
+      .header-bar > .btn { display: none; }
       .hero { grid-template-columns: 1fr; padding: 60px 24px; min-height: auto; }
+      .hero-left { width: 100%; max-width: 100%; }
       .hero-right { display: none; }
-      .hero h1 { font-size: 2rem; }
-      .hero-hook { font-size: 1.5rem; }
+      .hero h1 { font-size: 2.15rem; }
+      .hero-sub { width: 100%; font-size: 0.95rem; max-width: 100%; word-break: break-all; }
       h2 { font-size: 1.8rem; }
       .section { padding: 72px 24px; }
       .pain-grid { grid-template-columns: 1fr; }
@@ -578,6 +570,7 @@
     <nav>
       <a href="#pain">課題</a>
       <a href="#flow">解決策</a>
+      <a href="tools.html">できること</a>
       <a href="#price">料金</a>
       <a href="#profile">担当者</a>
     </nav>
@@ -589,12 +582,9 @@
 <div class="hero" id="top">
   <div class="hero-left">
     <div class="hero-label">FOR SOLO BUSINESS</div>
-    <h1>一人ビジネスに、<br>AIの城と白い時間を。</h1>
-
-    <p class="hero-hook">一人で抱え込む仕事を、<em>仕組み</em>で軽くする。</p>
+    <h1>一人ビジネスの仕事を<br>仕組みで軽くする。</h1>
     <p class="hero-sub">
-      SHIROは、一人ビジネスの業務整理から仕組み化まで伴走します。<br>
-      散らばった情報、後回しの事務、属人化した手順を整え、あなたの時間を取り戻すための土台を一緒につくります。
+      SHIROは、一人社長・個人事業主のための業務整理と仕組み化の伴走サービスです。散らばった情報、後回しの事務、属人化した手順を整え、あなたが本来の仕事に戻れる土台を一緒につくります。
     </p>
     <div class="hero-btns">
       <a href="#cta" class="btn btn-primary btn-lg">申し込む →</a>

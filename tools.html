@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHIRO｜機能カタログ（できることの部品一覧）</title>
+  <meta name="description" content="SHIRO が開発した機能を部品単位で一覧化。組み合わせて新しいツールを発想するための見取り図。">
+  <link rel="icon" type="image/png" href="assets/shiro-logo-mark.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f8fa; --white: #ffffff; --navy: #0f1f3d; --navy2: #1e3a5f;
+      --muted: #6b7280; --light: #e8edf5; --accent: #1e3a5f; --accent-soft: #eef2f8;
+      --border: #e5e7eb; --page-max: 1180px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      background: var(--bg); color: var(--navy); line-height: 1.7; -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    .inner { max-width: var(--page-max); margin: 0 auto; width: 100%; padding: 0 24px; }
+
+    header {
+      position: sticky; top: 0; z-index: 100; background: rgba(247,248,250,0.92);
+      backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+    }
+    .header-bar { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .04em; }
+    .logo img { height: 36px; width: auto; }
+    .header-nav a { color: var(--muted); font-size: 14px; margin-left: 22px; }
+    .header-nav a:hover { color: var(--navy); }
+
+    .hero { padding: 60px 0 24px; text-align: center; }
+    .hero h1 { font-size: clamp(26px, 4vw, 38px); letter-spacing: .02em; }
+    .hero p { color: var(--muted); margin-top: 14px; font-size: 16px; max-width: 720px; margin-left: auto; margin-right: auto; }
+
+    .legend { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 18px; font-size: 12px; color: var(--muted); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .dot.live { background: #1c7a44; } .dot.prep { background: #b76e00; } .dot.idea { background: #9aa1ab; }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 26px 0 36px; }
+    .filter {
+      border: 1px solid var(--border); background: var(--white); color: var(--navy2);
+      padding: 8px 16px; border-radius: 999px; font-size: 13px; cursor: pointer; transition: .15s;
+    }
+    .filter:hover { border-color: var(--navy2); }
+    .filter.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    .group { margin-bottom: 40px; }
+    .group h2 { font-size: 16px; letter-spacing: .04em; color: var(--navy2); margin-bottom: 16px; padding-left: 12px; border-left: 4px solid var(--navy2); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--white); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px; display: flex; flex-direction: column; transition: .16s;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(15,31,61,.07); }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .status { font-size: 11px; padding: 3px 9px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+    .status.live { background: #e7f5ec; color: #1c7a44; }
+    .status.prep { background: #fff4e5; color: #b76e00; }
+    .status.idea { background: #eef0f3; color: #6b7280; }
+    .card h3 { font-size: 16px; line-height: 1.5; }
+    .card p { color: var(--muted); font-size: 13.5px; margin: 6px 0 12px; flex: 1; }
+    .io { font-size: 12px; background: var(--accent-soft); border-radius: 8px; padding: 8px 10px; color: var(--navy2); }
+    .io b { color: var(--navy); font-weight: 600; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .tag { font-size: 11px; color: var(--muted); border: 1px solid var(--border); padding: 2px 8px; border-radius: 6px; }
+
+    .recipes { background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 32px; margin: 8px 0 56px; }
+    .recipes h2 { font-size: 20px; text-align: center; }
+    .recipes > p { text-align: center; color: var(--muted); font-size: 14px; margin: 8px 0 24px; }
+    .recipe { border-top: 1px solid var(--border); padding: 16px 0; }
+    .recipe:first-of-type { border-top: none; }
+    .recipe .formula { font-size: 13px; color: var(--navy2); }
+    .recipe .formula .chip { background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; margin: 0 2px; display: inline-block; }
+    .recipe .arrow { color: var(--muted); margin: 0 6px; }
+    .recipe .result { font-weight: 600; margin-top: 6px; }
+    .recipe .result .new { font-size: 11px; background: var(--navy); color: #fff; border-radius: 6px; padding: 2px 8px; margin-right: 8px; }
+
+    .cta { text-align: center; padding: 8px 0 80px; }
+    .cta h2 { font-size: 22px; }
+    .cta p { color: var(--muted); margin: 12px 0 24px; }
+    .btn { display: inline-block; background: var(--navy); color: #fff; padding: 14px 34px; border-radius: 999px; font-weight: 600; font-size: 15px; transition: .15s; }
+    .btn:hover { background: var(--navy2); }
+    footer { border-top: 1px solid var(--border); padding: 28px 0; color: var(--muted); font-size: 13px; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner header-bar">
+      <a class="logo" href="index.html"><img src="assets/shiro-logo-mark.png" alt="SHIRO"><span>SHIRO</span></a>
+      <nav class="header-nav">
+        <a href="index.html">トップ</a>
+        <a href="tools.html">機能カタログ</a>
+        <a href="hearing.html">無料相談</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero inner">
+    <h1>機能カタログ</h1>
+    <p>アプリ名ではなく「開発した機能」を部品として並べた見取り図。部品を組み合わせると、新しいツールが見えてくる。下部に組み合わせ例あり。</p>
+    <div class="legend">
+      <span><i class="dot live"></i>実装済・提供中</span>
+      <span><i class="dot prep"></i>準備中</span>
+      <span><i class="dot idea"></i>構想中</span>
+    </div>
+  </section>
+
+  <div class="inner">
+    <div class="filters" id="filters"></div>
+    <div id="groups"></div>
+  </div>
+
+  <div class="inner">
+    <section class="recipes" id="recipes"></section>
+  </div>
+
+  <section class="cta inner">
+    <h2>「この部品で、こんなの作れない？」を相談する</h2>
+    <p>組み合わせのアイデアも、自社業務への当てはめも、そのまま聞いてください。</p>
+    <a class="btn" href="hearing.html">無料相談・見積もり</a>
+  </section>
+
+  <footer><div class="inner">© SHIRO — 一人ビジネスに、AIの城と白い時間を。</div></footer>
+
+  <script>
+    // ── 機能部品（追加はこの配列に1件足すだけ）。status: live / prep / idea ──
+    const CAPS = [
+      // 取得・抽出
+      { cat:"取得・抽出", status:"live", name:"楽天 出店者データ取得",
+        desc:"楽天市場の公式APIで商品を検索し、出店者（店舗）を重複なく抽出する。",
+        in:"キーワード/ジャンル", out:"店舗名・URL・商品", tags:["楽天API","GAS"] },
+      { cat:"取得・抽出", status:"live", name:"Yahoo!ショッピング 出店者データ取得",
+        desc:"Yahoo!ショッピングの商品検索APIから出店者を抽出する。",
+        in:"キーワード", out:"ストア名・URL・商品", tags:["Yahoo API","GAS"] },
+      { cat:"取得・抽出", status:"live", name:"飲食店データ取得",
+        desc:"ホットペッパーグルメ公式APIでエリア×ジャンル×予算から飲食店を取得する。",
+        in:"エリア/ジャンル/予算", out:"店名・住所・客単価・席数", tags:["HPG API"] },
+      { cat:"取得・抽出", status:"live", name:"会社概要・特商法ページ解析",
+        desc:"店舗ページから会社名・代表者・電話・メール・住所を構造を問わず抽出する。",
+        in:"店舗ページURL", out:"会社名・代表・電話・メール・住所", tags:["パース","連絡先抽出"] },
+      { cat:"取得・抽出", status:"live", name:"YouTube Analytics 取得",
+        desc:"YouTube Analytics APIで視聴データ（属性・流入・維持率など）を取得する。",
+        in:"チャンネル/期間", out:"視聴指標データ", tags:["YouTube API"] },
+      { cat:"取得・抽出", status:"prep", name:"ランキング・新着の定期蓄積",
+        desc:"ランキングや新着を毎日貯めて、急上昇・トレンド・差分を検出できるようにする。",
+        in:"対象モール/カテゴリ", out:"日次の蓄積・差分", tags:["蓄積","トレンド"] },
+      { cat:"取得・抽出", status:"idea", name:"公的データ取得（建設/宅建）",
+        desc:"国交省などの公開データから事業者情報を取得する（規約が安全な鉱脈）。",
+        in:"業種/エリア", out:"商号・代表・所在地・許可番号", tags:["公的データ"] },
+
+      // 出品・EC運用
+      { cat:"出品・EC運用", status:"live", name:"BUYMA 自動出品エンジン",
+        desc:"参照番号ごとに商品情報と画像をまとめ、BUYMAへ自動で出品する。",
+        in:"商品データ＋画像", out:"BUYMA出品", tags:["BUYMA","自動出品"] },
+      { cat:"出品・EC運用", status:"prep", name:"利益が残る商品リサーチ",
+        desc:"販売相場・競合の多さ・仕入れ先価格を突き合わせ、手数料まで引いて利益が残る商品だけを見つける。",
+        in:"ブランド/カテゴリ", out:"利益が出る商品リスト", tags:["リサーチ","利益計算"] },
+      { cat:"出品・EC運用", status:"live", name:"在庫・価格の監視アラート",
+        desc:"出品中の商品の仕入れ先を見張り、在庫切れや値上げが起きたら通知する。売れ続けても赤字・欠品にしない。",
+        in:"監視リスト", out:"変化を即通知", tags:["在庫監視","価格アラート"] },
+      // ※「仕入れ画像 取り込み（ブックマークレット）」は 2026-07-08 に外部提供を停止（BUYMA規約 第13条の2＝許諾なき第三者画像は加工しても掲載不可）。
+      //   青木の検証用（自社ショップ）に限定するため、商品一覧からは非掲載。
+      { cat:"出品・EC運用", status:"prep", name:"多モール 商品CSV変換",
+        desc:"モール間で異なる商品CSVのフォーマットを相互変換し、出品データを移行する。",
+        in:"モールAのCSV", out:"モールBのCSV", tags:["CSV変換"] },
+      { cat:"出品・EC運用", status:"prep", name:"BASE 一括登録",
+        desc:"CSVからBASEへ商品を一括登録する。ログイン不要のGAS方式。",
+        in:"商品CSV", out:"BASE登録", tags:["BASE","一括登録"] },
+
+      // 画像・データ基盤
+      { cat:"画像・データ基盤", status:"live", name:"共有写真DB",
+        desc:"画像をDriveに集約し、索引シートで管理。クライアント横断で資産化する。",
+        in:"画像URL/base64", out:"Drive保存＋索引＋URL", tags:["Drive","索引"] },
+      { cat:"画像・データ基盤", status:"live", name:"ハッシュ重複排除",
+        desc:"データのMD5ハッシュで、同じものの二重登録を自動で防ぐ。",
+        in:"任意のデータ", out:"重複判定（dup）", tags:["重複排除","部品"] },
+      { cat:"画像・データ基盤", status:"live", name:"差分配信（新着だけ）",
+        desc:"前回までに出したものを除外し、新着・新規だけを出力する（サブスク向け）。",
+        in:"今回の全件", out:"前回との差分のみ", tags:["差分","サブスク"] },
+
+      // SNS・動画
+      { cat:"SNS・動画", status:"live", name:"SNS一括投稿",
+        desc:"1つの原稿を複数SNS（Threads・mixi2・TikTok等）へまとめて投稿する。",
+        in:"原稿＋画像/動画", out:"各SNSへ投稿", tags:["マルチ投稿"] },
+      { cat:"SNS・動画", status:"live", name:"投稿キュー・予約投稿",
+        desc:"投稿を貯めて順番に／予約して配信する。運用の手離れを良くする。",
+        in:"投稿リスト", out:"順次・予約配信", tags:["キュー","スケジュール"] },
+      { cat:"SNS・動画", status:"live", name:"OAuth トークン自動更新",
+        desc:"各SNSの認証トークンを自動でリフレッシュし、投稿を止めない。",
+        in:"初回認可", out:"自動更新された接続", tags:["OAuth"] },
+
+      // AI・分析
+      { cat:"AI・分析", status:"live", name:"AI 視聴者ズレ診断",
+        desc:"Analyticsをもとに、想定ペルソナと実際の視聴者層のズレをAIが指摘する。",
+        in:"分析データ", out:"ズレ診断＋改善提案", tags:["AI分析","診断"] },
+      { cat:"AI・分析", status:"live", name:"AIエージェント立ち上げ伴走",
+        desc:"Cursor × Claude Code で自社の業務をこなす「会社エージェント」を一緒に構築する。",
+        in:"自社の業務", out:"動くAIエージェント", tags:["Claude Code","伴走"] },
+
+      // 基盤・横断（土台）
+      { cat:"基盤・横断", status:"live", name:"ライセンス発行・停止",
+        desc:"キーを発行し、使用・停止を中央台帳で握る。未払い・解約で即停止できる。",
+        in:"クライアント情報", out:"発行キー＋停止権", tags:["胴元","停止権"] },
+      { cat:"基盤・横断", status:"live", name:"標準導入テンプレ",
+        desc:"新ツールを雛形に差し込むだけで量産できる、導入手順つきの土台。",
+        in:"新しい機能", out:"すぐ売れる形のツール", tags:["量産","テンプレ"] },
+      { cat:"基盤・横断", status:"live", name:"ステータス駆動 連絡エンジン",
+        desc:"スプレッドシートの状態変化をきっかけに、メールなどを自動送信する。",
+        in:"シートの状態変化", out:"自動連絡・通知", tags:["GAS","自動連絡"] },
+      { cat:"基盤・横断", status:"live", name:"長時間処理の中断・再開",
+        desc:"GASの6分制限を跨いで、大量データの処理を自動で中断・再開する。",
+        in:"大量の処理", out:"完走（分割実行）", tags:["GAS","大量処理"] },
+    ];
+
+    // ── 組み合わせ例（部品 → 新ツール）──
+    const RECIPES = [
+      { parts:["楽天 出店者データ取得","会社概要・特商法ページ解析","差分配信（新着だけ）"],
+        result:"楽天 新規出店者の営業リスト（毎週・新着だけ届く）", isNew:true },
+      { parts:["仕入れ画像 取り込み","共有写真DB","BUYMA 自動出品エンジン"],
+        result:"仕入れ画像を資産化して、横断・再利用で自動出品", isNew:true },
+      { parts:["ランキング・新着の定期蓄積","AI 視聴者ズレ診断"],
+        result:"売れ筋・急上昇トレンドのAIレポート（仕入れ判断支援）", isNew:true },
+      { parts:["YouTube Analytics 取得","AI 視聴者ズレ診断","SNS一括投稿"],
+        result:"分析→改善案→多SNS展開までを一本化", isNew:true },
+      { parts:["任意の取得・抽出","ライセンス発行・停止","標準導入テンプレ"],
+        result:"新しい取得ツールを即・量産して即・販売", isNew:true },
+      { parts:["共有写真DB","ハッシュ重複排除","多モール 商品CSV変換"],
+        result:"画像つき商品データをモール横断で移行・一元管理", isNew:true },
+    ];
+
+    const LABEL = { live:"実装済", prep:"準備中", idea:"構想中" };
+    const cats = ["すべて", ...Array.from(new Set(CAPS.map(c => c.cat)))];
+    let active = "すべて";
+    const groupsEl = document.getElementById('groups');
+    const filtersEl = document.getElementById('filters');
+
+    function card(c){
+      return `<div class="card">
+        <div class="card-top"><h3>${c.name}</h3><span class="status ${c.status}">${LABEL[c.status]}</span></div>
+        <p>${c.desc}</p>
+        <div class="io"><b>IN</b> ${c.in} &nbsp;→&nbsp; <b>OUT</b> ${c.out}</div>
+        <div class="tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div>`;
+    }
+    function render(){
+      const show = (active==="すべて") ? cats.slice(1) : [active];
+      groupsEl.innerHTML = show.map(cat => {
+        const items = CAPS.filter(c => c.cat===cat);
+        if(!items.length) return '';
+        return `<div class="group"><h2>${cat}</h2><div class="grid">${items.map(card).join('')}</div></div>`;
+      }).join('');
+    }
+    filtersEl.innerHTML = cats.map(c=>`<button class="filter${c===active?' active':''}" data-c="${c}">${c}</button>`).join('');
+    filtersEl.addEventListener('click', e=>{
+      const b=e.target.closest('.filter'); if(!b) return;
+      active=b.dataset.c;
+      document.querySelectorAll('.filter').forEach(f=>f.classList.toggle('active', f.dataset.c===active));
+      render();
+    });
+
+    document.getElementById('recipes').innerHTML =
+      `<h2>組み合わせ例</h2><p>部品をつなぐと、新しいツールになる。</p>` +
+      RECIPES.map(r=>`
+        <div class="recipe">
+          <div class="formula">${r.parts.map(p=>`<span class="chip">${p}</span>`).join('<span class="arrow">＋</span>')}</div>
+          <div class="result">${r.isNew?'<span class="new">NEW</span>':''}${r.result}</div>
+        </div>`).join('');
+
+    render();
+  </script>
+</body>
+</html>
