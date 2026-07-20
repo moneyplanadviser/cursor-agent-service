@@ -20,6 +20,18 @@
       --border: #e5e7eb;
       --radius: 999px;
       --page-max: 1280px;
+      /* accent system (2026-07 hero refresh) — coral lead + cool trio */
+      --acc: #ff6f61;
+      --acc-ink: #d64553;
+      --acc-soft: #ffece9;
+      --acc-rgb: 255,111,97;
+      --acc-cta1: #ff7a6b;
+      --acc-cta2: #f2585f;
+      --acc-cta-rgb: 240,90,95;
+      --sky-ink: #245b93;
+      --sky-soft: #e9f1fb;
+      --mint-ink: #1c7a51;
+      --mint-soft: #e6f4ec;
     }
 
     html { scroll-behavior: smooth; }
@@ -125,6 +137,17 @@
     }
     .btn-outline:hover { background: var(--accent-soft); }
     .btn-lg { padding: 16px 36px; font-size: 1rem; }
+    .btn-cta {
+      background: linear-gradient(135deg, var(--acc-cta1), var(--acc-cta2));
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(var(--acc-cta-rgb),0.30);
+    }
+    .btn-cta:hover {
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(var(--acc-cta-rgb),0.42);
+    }
 
     /* ─── HERO ─── */
     .hero {
@@ -140,7 +163,37 @@
       overflow: hidden;
       position: relative;
     }
-    .hero-left { max-width: 620px; min-width: 0; }
+    .hero-left { max-width: 620px; min-width: 0; position: relative; z-index: 1; }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(760px 460px at 96% -12%, rgba(var(--acc-rgb),0.16), transparent 62%),
+        radial-gradient(680px 520px at 2% 112%, rgba(36,91,147,0.08), transparent 60%);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--acc-soft);
+      color: var(--acc-ink);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      padding: 8px 16px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+    .hero-badge__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--acc);
+      box-shadow: 0 0 0 4px rgba(var(--acc-rgb),0.22);
+    }
     .hero-label {
       display: flex;
       align-items: center;
@@ -159,21 +212,18 @@
       background: var(--navy);
     }
     .hero h1 {
-      font-size: 3rem;
+      font-size: 3.4rem;
       font-weight: 900;
-      line-height: 1.18;
-      letter-spacing: 0;
+      line-height: 1.16;
+      letter-spacing: -0.01em;
       color: var(--navy);
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
-    .hero-concept {
-      font-size: 1rem;
-      color: var(--navy);
-      font-weight: 700;
-      line-height: 1.6;
-      margin-bottom: 28px;
+    .hero h1 .hl {
+      background: linear-gradient(transparent 58%, rgba(var(--acc-rgb),0.45) 58%);
+      padding: 0 3px;
+      border-radius: 2px;
     }
-    .hero-concept b { font-weight: 900; letter-spacing: 0.01em; }
     .hero-sub {
       font-size: 1rem;
       color: var(--muted);
@@ -181,6 +231,34 @@
       margin-bottom: 40px;
       max-width: 480px;
       overflow-wrap: anywhere;
+    }
+    .hero-eg { margin-bottom: 32px; }
+    .hero-eg__lead {
+      font-size: 0.82rem;
+      color: var(--navy);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .hero-eg__tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .eg-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--navy);
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 999px;
+    }
+    .eg-tag::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--acc);
+      flex-shrink: 0;
     }
     .hero-btns {
       display: flex;
@@ -225,6 +303,88 @@
     .hero-shape {
       width: 100%;
       max-width: 520px;
+    }
+    .hero-sub b { color: var(--acc-ink); font-weight: 800; }
+    .hero-right { position: relative; z-index: 1; min-width: 0; }
+    .stat-card {
+      width: 100%;
+      max-width: 470px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px 30px 24px;
+      box-shadow: 0 26px 64px rgba(15,31,61,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::after {
+      content: "城";
+      position: absolute;
+      right: -14px;
+      bottom: -50px;
+      font-family: "Hiragino Mincho ProN", serif;
+      font-size: 200px;
+      font-weight: 900;
+      line-height: 1;
+      color: rgba(15,31,61,0.035);
+      pointer-events: none;
+    }
+    .stat-card__kicker {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--acc-ink);
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+    .stat-card__title {
+      display: block;
+      font-size: 1.04rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.5;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .stat {
+      border-radius: 16px;
+      padding: 18px 8px 15px;
+      text-align: center;
+    }
+    .stat--acc { background: var(--acc-soft); }
+    .stat--sky { background: var(--sky-soft); }
+    .stat--mint { background: var(--mint-soft); }
+    .stat__num {
+      font-size: 1.55rem;
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+    .stat--acc .stat__num { color: var(--acc-ink); }
+    .stat--sky .stat__num { color: var(--sky-ink); }
+    .stat--mint .stat__num { color: var(--mint-ink); }
+    .stat__label { font-size: 0.72rem; color: var(--muted); line-height: 1.45; }
+    .stat-card__foot {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-align: center;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+      position: relative;
+      z-index: 1;
     }
 
     /* ─── SECTION BASE ─── */
@@ -550,11 +710,13 @@
       .header-bar { padding: 0 24px; }
       nav { display: none; }
       .header-bar > .btn { display: none; }
-      .hero { grid-template-columns: 1fr; padding: 60px 24px; min-height: auto; }
-      .hero-left { width: 100%; max-width: 100%; }
-      .hero-right { display: none; }
-      .hero h1 { font-size: 2.15rem; }
-      .hero-sub { width: 100%; font-size: 0.95rem; max-width: 100%; word-break: break-all; }
+      .hero { display: flex; flex-direction: column; align-items: stretch; padding: 52px 22px; min-height: auto; gap: 34px; }
+      .hero-left, .hero-right { width: 100%; max-width: 100%; min-width: 0; }
+      .stat-card { max-width: 100%; padding: 24px 20px 20px; }
+      .stat { padding: 14px 6px 12px; }
+      .stat__num { font-size: 1.4rem; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero-sub { width: 100%; font-size: 0.95rem; max-width: 100%; }
       h2 { font-size: 1.8rem; }
       .section { padding: 72px 24px; }
       .pain-grid { grid-template-columns: 1fr; }
@@ -589,14 +751,24 @@
 <!-- HERO -->
 <div class="hero" id="top">
   <div class="hero-left">
-    <div class="hero-label">FOR SOLO BUSINESS</div>
-    <h1>一人ビジネスの仕事を<br>仕組みで軽くする。</h1>
-    <p class="hero-concept"><b>1day1minutes</b> — 1日1分の時間を作るところから。</p>
+    <div class="hero-badge"><span class="hero-badge__dot"></span>1day1minutes ・ 1日1分の自動化から</div>
+    <h1>一人ビジネスの仕事を、<br><span class="hl">仕組み</span>で軽くする。</h1>
     <p class="hero-sub">
-      SHIROは、一人社長・個人事業主のための業務整理と仕組み化の伴走サービスです。散らばった情報、後回しの事務、属人化した手順を整え、あなたが本来の仕事に戻れる土台を一緒につくります。
+      あなたの仕事に合わせて、<b>専用の仕組み</b>を一緒に作ります。作って終わりではなく、自分で回せる形で手元に残るので、ずっと使えます。
     </p>
+    <div class="hero-eg">
+      <div class="hero-eg__lead">その仕組みが、たとえばこんな作業を1分に。</div>
+      <div class="hero-eg__tags">
+        <span class="eg-tag">メールの下書き</span>
+        <span class="eg-tag">SNSの定期投稿</span>
+        <span class="eg-tag">請求書づくり</span>
+        <span class="eg-tag">問い合わせ客リサーチ</span>
+        <span class="eg-tag">面談メモの要約</span>
+        <span class="eg-tag">日程調整</span>
+      </div>
+    </div>
     <div class="hero-btns">
-      <a href="hearing.html" class="btn btn-primary btn-lg">申し込む →</a>
+      <a href="hearing.html" class="btn btn-cta btn-lg">申し込む →</a>
       <a href="#flow" class="btn btn-outline btn-lg">詳しく見る</a>
     </div>
     <div class="trust-badges">
@@ -606,14 +778,16 @@
     </div>
   </div>
   <div class="hero-right">
-    <svg class="hero-shape" viewBox="0 0 500 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M420 80 C480 140 500 220 460 300 C420 380 340 400 320 480 C300 560 340 600 300 600" stroke="#d0d9e8" stroke-width="80" stroke-linecap="round" fill="none"/>
-      <path d="M380 40 C440 100 460 180 420 260 C380 340 300 360 280 440 C260 520 300 560 260 580" stroke="#e8edf5" stroke-width="60" stroke-linecap="round" fill="none"/>
-      <circle cx="120" cy="180" r="6" fill="#c4cfe0"/>
-      <circle cx="80" cy="320" r="4" fill="#d0d9e8"/>
-      <circle cx="200" cy="100" r="3" fill="#c4cfe0"/>
-      <text x="60" y="500" font-family="serif" font-size="120" font-weight="900" fill="#e8edf5" letter-spacing="0">城</text>
-    </svg>
+    <div class="stat-card">
+      <span class="stat-card__kicker">つもる、余白。</span>
+      <span class="stat-card__title">1日1分の自動化を、積み上げていくと。</span>
+      <div class="stat-grid">
+        <div class="stat stat--acc"><div class="stat__num">1分</div><div class="stat__label">毎日の時短<br>（自動化1個）</div></div>
+        <div class="stat stat--sky"><div class="stat__num">40時間</div><div class="stat__label">10個で<br>1年に</div></div>
+        <div class="stat stat--mint"><div class="stat__num">5日</div><div class="stat__label">増える休み<br>（営業日換算）</div></div>
+      </div>
+      <div class="stat-card__foot">小さく積むほど、余白は大きくなる。</div>
+    </div>
   </div>
 </div>
 
